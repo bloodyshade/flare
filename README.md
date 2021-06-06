@@ -100,6 +100,12 @@ PUSHER_APP_CLUSTER=mt1
 
 This game uses' horizon to monitor its jobs. For local development, just go to /horizon.
 
+## Typescript and Tailwind
+
+Tailwind is already setup for you, and most typescript for react, however, you will need to run:
+
+`yarn global add typescript` or `npm install -g typescript`
+
 ## Extra Config
 
 In the ENV example file is some extra bits you can set:
