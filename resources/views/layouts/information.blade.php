@@ -101,7 +101,7 @@
     @livewireScripts
 
     <script src="{{ asset('js/manifest.js') }}"></script>
-    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/app.tsx') }}"></script>
 
     <script>
         function showSideBar() {
