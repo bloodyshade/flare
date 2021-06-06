@@ -45,115 +45,14 @@
 @endphp
 
 <body class="fix-header fix-sidebar card-no-border {{!$previousUrlIsInfo ? 'mini-sidebar' : ''}}">
-    <div id="main-wrapper">
-        <div id="app">
-            <header class="topbar">
-                <nav class="navbar top-navbar navbar-expand-md navbar-light">
-                    <div class="navbar-collapse">
-                        @guest
-                        @else
-                            <!-- ============================================================== -->
-                            <!-- toggle and nav items -->
-                            <!-- ============================================================== -->
-                            <ul class="navbar-nav mr-auto mt-md-0 ">
-                                <li class="nav-item">
-                                    <a class="nav-link sidebartoggler text-muted" href="javascript:void(0)">
-                                        <i class="fas fa-bars"></i>
-                                    </a>
-                                </li>
-                            </ul>
-                        @endguest
-                        <!-- ============================================================== -->
-                        <!-- User profile -->
-                        <!-- ============================================================== -->
-                        @guest
-                        @else
-                            @include('layouts.partials.user-profile-nav')
-                        @endguest
-
-                        <ul class="navbar-nav my-lg-0 text-align-right force-right">
-                            <!-- Authentication Links -->
-                            @guest
-                                <li class="nav-item">
-                                    <a class="nav-link" href="/">{{ __('Home') }}</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                                </li>
-                                @if (Route::has('register'))
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                    </li>
-                                @endif
-                            @endguest
-                        </ul>
-                    </div>
-                </nav>
-            </header>
-
-            @guest
-            @else
-                @if ($previousUrlIsInfo)
-                    <aside class="left-sidebar info-sidebar" id="info-left-sidebar">
-                        <!-- Sidebar scroll-->
-                        <div class="scroll-sidebar">
-                            <!-- Sidebar navigation-->
-                            <nav class="sidebar-nav info-nav">
-                                @include('layouts.partials.sidebar.informationsidebar')
-                            </nav>
-                            <!-- End Sidebar navigation -->
-                        </div>
-                    </aside>
-                @else
-                    <aside class="left-sidebar">
-                        <!-- Sidebar scroll-->
-                        <div class="scroll-sidebar">
-                            <!-- Sidebar navigation-->
-                            <nav class="sidebar-nav">
-                                @if (auth()->user()->hasRole('Admin'))
-                                    @include('layouts.partials.sidebar.adminsidebar')
-                                @else
-                                    @include('layouts.partials.sidebar.playersidebar')
-                                @endif
-                            </nav>
-                            <!-- End Sidebar navigation -->
-                        </div>
-                        <!-- End Sidebar scroll-->
-                    </aside>
-                @endif
-            @endguest
-
-            @guest
-                <div class="container-fluid" style="min-height: 853px;">
-                    @include('layouts.partials.alerts')
-{{--                    @yield('content')--}}
-                </div>
-
-                <footer class="footer" style="left: 0;"> © 2020 Flare </footer>
-            @else
-                <div class="page-wrapper">
-                    <div class="container-fluid mb-5">
-
-                        @if(!auth()->user()->hasRole('Admin'))
-                            <div id="refresh"></div>
-                        @endif
-
-                        @include('layouts.partials.alerts')
-{{--                        @yield('content')--}}
-                    </div>
-                </div>
-
-                <footer class="footer"> © 2020 Flare </footer>
-            @endif
-        </div>
-    </div>
+    @include('layouts.partials.navigation.general-navigation')
 
     <!-- Scripts -->
 
     @livewireScripts
 
     <script src="{{ asset('js/manifest.js') }}"></script>
-    <script src="{{ asset('js/app.tsx') }}"></script>
+    <script src="{{ asset('js/app.js') }}"></script>
 
     @stack('scripts')
 </body>
