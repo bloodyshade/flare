@@ -10,9 +10,34 @@ const mix = require('laravel-mix');
  | file for the application as well as bundling up all the JS files.
  |
  */
+const tailwindcss             = require('tailwindcss');
+const postCssImport           = require("postcss-import");
+const postCssNested           = require("postcss-nested");
+const postcssCustomProperties = require("postcss-custom-properties");
+const autoprefixer            = require("autoprefixer");
 
-mix.ts('resources/js/app.tsx', 'public/js').react()
-   .postCss('resources/css/app.css', 'public/css', [
-      require('tailwindcss'),
-   ])
-   .version();
+mix.webpackConfig({
+    stats: {
+      hash: true,
+      version: true,
+      timings: true,
+      children: true,
+      errors: true,
+      errorDetails: true,
+      warnings: true,
+      chunks: true,
+      modules: false,
+      reasons: true,
+      source: true,
+      publicPath: true,
+    }
+  }).copy('resources/js/theme', 'public/js')
+    .ts('resources/js/app.tsx', 'public/js').react()
+    .postCss('resources/css/app.css', 'public/css', [
+      postCssImport(),
+      tailwindcss(),
+      postCssNested(),
+      postcssCustomProperties(),
+      autoprefixer(),
+    ])
+    .version();

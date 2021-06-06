@@ -33,8 +33,6 @@
 
     <script src="{{ asset('js/vendor.js') }}"></script>
     <script src="{{ asset('js/manifest.js') }}"></script>
-    <script src={{asset('js/market-board.js')}} type="text/javascript"></script>
-    <script src={{asset('js/kingdom-unit-movement.js')}} type="text/javascript"></script>
     <script src="https://unpkg.com/echarts/dist/echarts.min.js"></script>
     <script src="https://unpkg.com/@chartisan/echarts/dist/chartisan_echarts.js"></script>
 
@@ -52,6 +50,8 @@
     @livewireScripts
 
     <script src="{{ asset('js/manifest.js') }}"></script>
+    <script src="{{ asset('js/vendor.js') }}"></script>
+    <script src="{{ asset('js/script.js') }}"></script>
     <script src="{{ asset('js/app.js') }}"></script>
 
     @stack('scripts')

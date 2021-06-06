@@ -8,7 +8,7 @@
     <span class="brand">Yeti</span>
 
     <!-- Search -->
-    <form class="hidden md:block ml-10" action="#">
+    <form class="md:block ml-10" action="#">
         <label class="form-control-addon-within rounded-full">
             <input type="text" class="form-control border-none" placeholder="Search">
             <button type="button"
