@@ -1,5 +1,7 @@
 @import url("https://fonts.googleapis.com/css?family=Nunito+Sans:400,700|Nunito:400,700&display=swap");
 
+@import 'rpg-awesome/css/rpg-awesome.min.css';
+
 /* Line Awesome */
 @import "line-awesome/dist/line-awesome/css/line-awesome.css";
 
@@ -17,8 +19,46 @@
 /* Glide.js */
 @import "@glidejs/glide/dist/css/glide.core.css";
 
+/**
+  Tail Wind
+ */
 @import "tailwindcss/base";
 @import './theme/base.css';
 @import "tailwindcss/components";
 @import './theme/components.css';
 @import "tailwindcss/utilities";
+
+
+@layer utilities {
+    .flare-spacer-1 {
+        margin-top: 50px;
+    }
+
+    .flare-spacer-2 {
+        margin-top: 100px;
+    }
+}
+
+dl {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 0;
+    margin-bottom: -10px;
+}
+
+dt {
+    margin-left: auto;
+    width: 50%;
+    text-align: left;
+    font-weight: bold;
+}
+
+dd {
+    margin-left: auto;
+    width: 50%;
+}
+
+dd ul {
+    margin-left: -40px;
+    list-style: none;
+}

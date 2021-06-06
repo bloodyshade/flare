@@ -3,7 +3,7 @@ const aspectRatio = require("@tailwindcss/aspect-ratio");
 
 module.exports = {
   purge: ['./resources/**/*.{js,vue,blade.php,jsx,tsx}'],
-  darkMode: false, // or 'media' or 'class'
+  darkMode: "class", // or 'media' or 'class'
   theme: {
     container: {
       center: true,
@@ -41,6 +41,10 @@ module.exports = {
         800: "#242526",
         900: "#151515",
       },
+      light: {
+        100: "#ffffff",
+        200: "#f1f0f0",
+      }
     },
     extend: {
       fontSize: {

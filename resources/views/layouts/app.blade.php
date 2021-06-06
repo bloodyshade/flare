@@ -45,6 +45,11 @@
 <body class="fix-header fix-sidebar card-no-border {{!$previousUrlIsInfo ? 'mini-sidebar' : ''}}">
     @include('layouts.partials.navigation.general-navigation')
 
+    <main class="workspace">
+        @yield('content');
+    </main>
+
+
     <!-- Scripts -->
 
     @livewireScripts
