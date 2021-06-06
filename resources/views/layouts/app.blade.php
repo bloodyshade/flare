@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Language" content="en">
     <meta name="google" content="notranslate">
 
@@ -28,12 +28,9 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
 
     @livewireStyles
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
     <script src="{{ asset('js/vendor.js') }}"></script>
     <script src="{{ asset('js/manifest.js') }}"></script>
     <script src={{asset('js/market-board.js')}} type="text/javascript"></script>
@@ -129,7 +126,7 @@
             @guest
                 <div class="container-fluid" style="min-height: 853px;">
                     @include('layouts.partials.alerts')
-                    @yield('content')
+{{--                    @yield('content')--}}
                 </div>
 
                 <footer class="footer" style="left: 0;"> © 2020 Flare </footer>
@@ -142,7 +139,7 @@
                         @endif
 
                         @include('layouts.partials.alerts')
-                        @yield('content')
+{{--                        @yield('content')--}}
                     </div>
                 </div>
 

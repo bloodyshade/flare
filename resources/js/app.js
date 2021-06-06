@@ -4,13 +4,6 @@
  * building robust, powerful web applications using React + Laravel.
  */
 
-require('./bootstrap');
-
-require('../vendor/monster/theme/js/jquery.slimscroll.js');
-require('../vendor/monster/theme/js/waves.js');
-require('../vendor/monster/assets/plugins/sticky-kit-master/dist/sticky-kit.min.js');
-require('../vendor/monster/theme/js/sidebarmenu.js');
-require('../vendor/monster/theme/js/custom.js');
 
 /**
  * Next, we will create a fresh React component instance and attach it to
@@ -18,9 +11,3 @@ require('../vendor/monster/theme/js/custom.js');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-require('./components/game');
-require('./components/admin-chat');
-require('./components/adventure-menue');
-require('./components/notification-center');
-require('./components/refresh');
-require('./components/marketboard/board');

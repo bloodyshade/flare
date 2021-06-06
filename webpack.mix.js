@@ -11,12 +11,8 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.react('resources/js/app.js', 'public/js')
-   .react('resources/js/helpers/market-board.js', 'public/js')
-   .react('resources/js/helpers/kingdom-unit-movement.js', 'public/js')
-   .react('resources/js/helpers/admin-chat-messages.js', 'public/js')
-   .react('resources/js/helpers/admin-site-stats-components.js', 'public/js')
-   .sass('resources/sass/app.scss', 'public/css')
-   //.extract(['lodash', 'react', 'jquery', 'bootstrap'])
-   .version()
-   .browserSync('127.0.0.1:8000');
+mix.js('resources/js/app.js', 'public/js').react()
+   .postCss("resources/css/app.css", "public/css", [
+     require("tailwindcss"),
+   ])
+   .version();
