@@ -12,7 +12,7 @@
 
 
     <!-- Brand -->
-    <span class="brand">Planes of Tlessa</span>
+        <span class="brand"><a href="/">Planes of Tlessa</a></span>
 
     <!-- Right -->
     @guest

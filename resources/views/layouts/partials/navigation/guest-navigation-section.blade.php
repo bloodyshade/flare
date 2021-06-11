@@ -7,6 +7,9 @@
 
     <ul class="flex space-x-6 text-lg">
         <li>
+            <a class="text-gray-600 hover:text-gray-500" href="/">Home</a>
+        </li>
+        <li>
             <a class="text-gray-600 hover:text-gray-500" href="{{route('login')}}">Login</a>
         </li>
         <li>
