@@ -2,6 +2,9 @@
 <header class="top-bar">
 
     @guest
+        @if($helpSideBar)
+            <button type="button" class="menu-toggler la la-bars" data-toggle="menu"></button>
+        @endif
     @else
         <!-- Menu Toggler -->
         <button type="button" class="menu-toggler la la-bars" data-toggle="menu"></button>
@@ -20,6 +23,13 @@
 </header>
 
 @guest
+    @if($helpSideBar)
+        @include('layouts.partials.sidebar.informationsidebar')
+    @endif
 @else
-    @include('layouts.partials.sidebar.playersidebar')
+    @if($helpSideBar)
+        @include('layouts.partials.sidebar.informationsidebar')
+    @else
+        @include('layouts.partials.sidebar.playersidebar')
+    @endif
 @endguest

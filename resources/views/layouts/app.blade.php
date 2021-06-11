@@ -39,11 +39,13 @@
     @stack('head')
 </head>
 @php
-    $previousUrlIsInfo = strpos(url()->previous(), 'information') !== false;
+    $previousUrlIsInfo = strpos(url()->current(), 'information') !== false;
 @endphp
 
-<body class="fix-header fix-sidebar card-no-border {{!$previousUrlIsInfo ? 'mini-sidebar' : ''}}">
-    @include('layouts.partials.navigation.general-navigation')
+<body>
+    @include('layouts.partials.navigation.general-navigation', [
+        'helpSideBar' => $previousUrlIsInfo,
+    ])
 
     <main class="workspace">
         @yield('content');

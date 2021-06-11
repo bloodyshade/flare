@@ -1,5 +1,7 @@
 const colors = require("tailwindcss/colors");
 const aspectRatio = require("@tailwindcss/aspect-ratio");
+const forms = require('@tailwindcss/forms');
+const typography = require('@tailwindcss/typography');
 
 module.exports = {
   purge: ['./resources/**/*.{js,vue,blade.php,jsx,tsx}'],
@@ -91,5 +93,5 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [aspectRatio],
+  plugins: [aspectRatio, forms, typography],
 }

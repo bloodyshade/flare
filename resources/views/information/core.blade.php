@@ -1,14 +1,10 @@
-@extends('layouts.information', [
-    'pageTitle' => $pageTitle
-])
+@extends('layouts.app')
 
 @section('content')
-    <div class="mt-5">
+    <div class="mt-5 container justify-center w-full md:w-3/4">
         @foreach($sections as $section)
-            <div class="row justify-content-center mb-2 mt-3 text-lg">
-                <div class="col-xl-12">
-                    @markdown($section['content'])
-                </div>
+            <div class="prose-lg md:prose-xl max-w-full">
+                @markdown($section['content'])
             </div>
 
             @if (!is_null($section['view']))

@@ -5,6 +5,13 @@
         <div class="w-full text-center">
             <h1 class="text-7xl text-gray-800 dark:text-light-200">Planes of Tlessa</h1>
             <p class="mt-3 text-2xl text-gray-700 dark:text-light-200">A world of possibilities!</p>
+            <div class="mt-8 space-x-2">
+                <x-common.buttons.link title="Join!"/>
+                <x-common.buttons.link title="Releases" color="yellow"/>
+                <x-common.buttons.link title="Help Section" color="green" link="{{route('info.page', [
+                    'pageName' => 'home'
+                ])}}"/>
+            </div>
         </div>
         <div class="w-full text-center mt-16 flare-spacer-1">
             <img class="rounded" src="{{asset('promotion/game.png')}}" />
