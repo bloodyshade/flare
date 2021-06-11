@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('head')
+    <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
+@endpush
+
 @section('content')
     <div class="mt-5 container justify-center w-full md:w-3/4">
         @foreach($sections as $section)
@@ -27,4 +31,13 @@
 
         @endforeach
     </div>
+
+    @push('scripts')
+        <script>
+            var lightbox = GLightbox();
+            lightbox.on('open', (target) => {
+                // do nothing ...
+            });
+        </script>
+    @endpush
 @endsection
