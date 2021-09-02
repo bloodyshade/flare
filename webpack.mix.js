@@ -35,6 +35,7 @@ mix.webpackConfig({
     .ts('resources/js/app.tsx', 'public/js').react()
     .postCss('resources/css/app.css', 'public/css', [
       postCssImport(),
+      require('tailwindcss/nesting')(require('postcss-nesting')),
       tailwindcss(),
       postCssNested(),
       postcssCustomProperties(),

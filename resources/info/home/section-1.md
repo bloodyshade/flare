@@ -41,7 +41,7 @@ There is something for everyone, it just depends on what you want to do. Run the
 >
 > Simple click help in the drop down menu at the top right:
 >
-> <div class="mb-4">
+> <div class="gallery mb-4">
 >    <a href="/storage/info/home/images/help.png" class="glightbox">
 >        <img src="/storage/info/home/images/help.png" class="img-fluid" />
 >    </a>

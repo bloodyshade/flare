@@ -49,3 +49,9 @@ window.Echo = new Echo({
     }
   }
 });
+
+// Simple Light Box:
+
+import SimpleLightbox from "simplelightbox";
+
+new SimpleLightbox('.gallery a');

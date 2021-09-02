@@ -2,7 +2,7 @@
     "private": true,
     "scripts": {
         "dev": "yarn run development",
-        "development": "mix",
+        "development": "TAILWIND_MODE=build mix",
         "watch": "mix watch",
         "watch-poll": "mix watch -- --watch-options-poll=1000",
         "hot": "mix watch --hot",
@@ -11,7 +11,12 @@
     },
     "devDependencies": {
         "@babel/preset-react": "^7.13.13",
+        "@tailwindcss/aspect-ratio": "^0.2.1",
+        "@tailwindcss/forms": "^0.3.3",
         "@tailwindcss/jit": "^0.1.18",
+        "@tailwindcss/typography": "^0.4.1",
+        "@types/react": "^17.0.9",
+        "@types/react-dom": "^17.0.6",
         "axios": "^0.21.1",
         "browser-sync": "^2.26.14",
         "browser-sync-webpack-plugin": "2.2.2",
@@ -31,11 +36,6 @@
     "dependencies": {
         "@ashvin27/react-datatable": "^1.5.3",
         "@glidejs/glide": "^3.4.1",
-        "@tailwindcss/aspect-ratio": "^0.2.1",
-        "@tailwindcss/forms": "^0.3.3",
-        "@tailwindcss/typography": "^0.4.1",
-        "@types/react": "^17.0.9",
-        "@types/react-dom": "^17.0.6",
         "animate.css": "^4.1.1",
         "autoprefixer": "^10.2.6",
         "chart.js": "^2.9.4",
@@ -45,6 +45,7 @@
         "postcss-custom-properties": "^11.0.0",
         "postcss-import": "^14.0.2",
         "postcss-nested": "^5.0.5",
+        "postcss-nesting": "^8.0.1",
         "pusher-js": "^5.0.3",
         "react-chartjs-2": "^2.11.1",
         "react-content-loader": "^5.1.1",
@@ -52,6 +53,7 @@
         "react-countdown-circle-timer": "^2.5.0",
         "react-draggable": "^4.1.0",
         "rpg-awesome": "^0.2.0",
+        "simplelightbox": "^2.8.0",
         "tippy.js": "^6.3.1"
     }
 }

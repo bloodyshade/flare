@@ -1,6 +1,6 @@
 Let’s recruit some basic spearmen. Just like with buildings, you can click the row in the table for the unit you want to recruit:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/kingdoms/images/recruitment-modal.png" class="glightbox">
         <img src="/storage/info/kingdoms/images/recruitment-modal.png" class="img-fluid" />
     </a>
@@ -14,7 +14,7 @@ Let’s select some spearmen:
 >
 > You can only recruit as many units as you have population and resources. The numbers in unit cost section of the modal will go up as you select more. If the numbers go red, you will not be able to recruit as you don’t have the resources. If they go green, you will be able to recruit the units.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/kingdoms/images/recruitment-selected.png" class="glightbox">
         <img src="/storage/info/kingdoms/images/recruitment-selected.png" class="img-fluid" />
     </a>
@@ -30,7 +30,7 @@ When we are ready to recruit, we can click Recruit Selected beside the slider. I
 
 We can cancel a recruitment the same way we do for buildings (by clicking unit queue at the top of the kingdom management modal and clicking on the unit you want to cancel in the table).
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/kingdoms/images/unit-queue.png" class="glightbox">
         <img src="/storage/info/kingdoms/images/unit-queue.png" class="img-fluid" />
     </a>
@@ -40,7 +40,7 @@ The same rules apply, it’s the time from you clicked the recruit, to the time 
 
 Just like for buildings you will only get a percentage of resources back based on the time left.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/kingdoms/images/cancel-recruitment.png" class="glightbox">
         <img src="/storage/info/kingdoms/images/cancel-recruitment.png" class="img-fluid" />
     </a>
@@ -64,7 +64,7 @@ This is why a lot of people will end up settling kingdoms next to each other, ev
 
 You can always get back to a kingdom by teleporting to it. Click on the kingdom on the map and click teleport - assuming you can move and have the gold.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/kingdoms/images/teleport.png" class="glightbox">
         <img src="/storage/info/kingdoms/images/teleport.png" class="img-fluid" />
     </a>
@@ -75,7 +75,7 @@ You can always get back to a kingdom by teleporting to it. Click on the kingdom 
 
 We will discuss this in further detail in the attacking section of this guide, however, as you noticed your kingdoms show up for you and only you on the map:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/kingdoms/images/map.png" class="glightbox">
         <img src="/storage/info/kingdoms/images/map.png" class="img-fluid" />
     </a>
@@ -83,7 +83,7 @@ We will discuss this in further detail in the attacking section of this guide, h
 
 To find another person’s kingdom, you must travel around the map. Once you find another person’s kingdom, you’ll see an attack button appear in the action section:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/kingdoms/images/attack-action.png" class="glightbox">
         <img src="/storage/info/kingdoms/images/attack-action.png" class="img-fluid" />
     </a>

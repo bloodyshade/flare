@@ -2,7 +2,7 @@
 
 To set sail you will move to a port location and see: Set Sail.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/set-sail/images/map.png" class="glightbox">
         <img src="/storage/info/set-sail/images/map.png" class="img-fluid" />
     </a>
@@ -10,7 +10,7 @@ To set sail you will move to a port location and see: Set Sail.
 
 From here clicking set sail will open a new section under the actions section.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/set-sail/images/set-sail.png" class="glightbox">
         <img src="/storage/info/set-sail/images/set-sail.png" class="img-fluid" />
     </a>

@@ -2,13 +2,13 @@
 
 When you need to control your emails, update your security questions or just feel like changing your character name, you can always head to settings:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/settings/images/drop-down.png" class="glightbox">
         <img src="/storage/info/settings/images/drop-down.png" class="img-fluid" />
     </a>
 </div>
 <hr />
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/settings/images/settings-top.png" class="glightbox">
         <img src="/storage/info/settings/images/settings-top.png" class="img-fluid" />
     </a>
@@ -27,7 +27,7 @@ Under that, you can see some email settings – you can turn these on and off to
 
 Finally, we come to the security questions section at the bottom of the page:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/settings/images/security.png" class="glightbox">
         <img src="/storage/info/settings/images/security.png" class="img-fluid" />
     </a>

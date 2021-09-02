@@ -11,7 +11,7 @@ Borrowing the idea of settling kingdoms from [racewarkingdoms](), I have made so
 
 First, to settle a kingdom you simply move to any location that is not a port or special location. You’ll know if you can settle a kingdom by seeing this button appear in the actions section:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/kingdoms/images/settle-action.png" class="glightbox">
         <img src="/storage/info/kingdoms/images/settle-action.png" class="img-fluid" />
     </a>
@@ -19,7 +19,7 @@ First, to settle a kingdom you simply move to any location that is not a port or
 
 From here you may click Settle Kingdom, this will open a popup:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/kingdoms/images/settle-modal.png" class="glightbox">
         <img src="/storage/info/kingdoms/images/settle-modal.png" class="img-fluid" />
     </a>
@@ -31,7 +31,7 @@ You’ll type in a name. Kingdom names must be between 5 and 30 characters. Spac
 > 
 > Should you already have one kingdom on the plane you settled on, additional kingdoms will cost you gold.
 > 
-> <div class="mb-4">
+> <div class="gallery mb-4">
 >    <a href="/storage/info/kingdoms/images/additional-cost.png" class="glightbox">
 >        <img src="/storage/info/kingdoms/images/additional-cost.png" class="img-fluid" />
 >    </a>
@@ -46,7 +46,7 @@ You’ll type in a name. Kingdom names must be between 5 and 30 characters. Spac
 
 Once that’s done, you’ll click settle and from there a new modal window will popup:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/kingdoms/images/kingdom-management-modal.png" class="glightbox">
         <img src="/storage/info/kingdoms/images/kingdom-management-modal.png" class="img-fluid" />
     </a>
@@ -64,7 +64,7 @@ Some buildings such as keep, walls, farm and barracks will cause your kingdom to
 
 For example, lets upgrade our walls:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/kingdoms/images/building-upgrade.png" class="glightbox">
         <img src="/storage/info/kingdoms/images/building-upgrade.png" class="img-fluid" />
     </a>
@@ -94,7 +94,7 @@ You will also notice that it will take 7 minutes to upgrade the building. Let’
 
 Notice how you had a building queue and unit queue tab? Let’s click on the building queue tab:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/kingdoms/images/building-queue.png" class="glightbox">
         <img src="/storage/info/kingdoms/images/building-queue.png" class="img-fluid" />
     </a>
@@ -102,7 +102,7 @@ Notice how you had a building queue and unit queue tab? Let’s click on the bui
 
 Here you can see our building is upgrading, if we click the row in the table for that building:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/kingdoms/images/building-upgrade-cancel.png" class="glightbox">
         <img src="/storage/info/kingdoms/images/building-upgrade-cancel.png" class="img-fluid" />
     </a>
@@ -118,7 +118,7 @@ You can see we can cancel the building; we can do the same thing for units in th
 
 Once the building is done, assuming you are logged in you’ll see it in chat:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/kingdoms/images/building-upgrade-chat.png" class="glightbox">
         <img src="/storage/info/kingdoms/images/building-upgrade-chat.png" class="img-fluid" />
     </a>
@@ -134,7 +134,7 @@ The same will happen for units (see below).
 
 When your kingdom gains resources per hour you’ll see:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/kingdoms/images/resource-chat.png" class="glightbox">
         <img src="/storage/info/kingdoms/images/resource-chat.png" class="img-fluid" />
     </a>
@@ -156,7 +156,7 @@ Now that we have upgraded a building, lets discuss units.
 
 With in kingdom management you can click Unit Recruitment beside the Buildings at the bottom:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/kingdoms/images/unit-table.png" class="glightbox">
         <img src="/storage/info/kingdoms/images/unit-table.png" class="img-fluid" />
     </a>

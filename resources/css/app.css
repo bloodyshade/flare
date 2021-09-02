@@ -13,11 +13,10 @@
 @import "tippy.js/animations/shift-toward-extreme.css";
 @import "tippy.js/animations/perspective.css";
 
+@import "./simple-lightbox.css";
+
 /* Animate.css */
 @import "animate.css/animate.css";
-
-/* Glide.js */
-@import "@glidejs/glide/dist/css/glide.core.css";
 
 /**
   Tail Wind
@@ -37,6 +36,10 @@
     .flare-spacer-2 {
         margin-top: 100px;
     }
+}
+
+blockquote {
+    @apply border-blue-600 border-solid border-l-8 bg-blue-200 p-1 dark:bg-blue-200 dark:border-blue-500 text-gray-800;
 }
 
 dl {

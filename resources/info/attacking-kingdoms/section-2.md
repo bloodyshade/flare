@@ -3,7 +3,7 @@ As you can see each unit has its own building, level that building must be to re
 
 Now that you have some units, where are all the kingdoms?
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/attacking-kingdoms/images/map-kingdom.png" class="glightbox">
         <img src="/storage/info/attacking-kingdoms/images/map-kingdom.png" class="img-fluid" />
     </a>
@@ -14,7 +14,7 @@ This is the fun part, you must move around the map, until you see, in the action
 
 This makes use of the map aside from moving around to locations and ports. Once you find another players kingdom you can begin the attack process:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/attacking-kingdoms/images/attack-button.png" class="glightbox">
         <img src="/storage/info/attacking-kingdoms/images/attack-button.png" class="img-fluid" />
     </a>
@@ -22,7 +22,7 @@ This makes use of the map aside from moving around to locations and ports. Once 
 
 <hr />
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/attacking-kingdoms/images/attack-dialogue.png" class="glightbox">
         <img src="/storage/info/attacking-kingdoms/images/attack-dialogue.png" class="img-fluid" />
     </a>
@@ -40,7 +40,7 @@ From here your first step is to select the kingdoms you want to attack from. Eac
 
 Let us send out some units:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/attacking-kingdoms/images/unit-selection.png" class="glightbox">
         <img src="/storage/info/attacking-kingdoms/images/unit-selection.png" class="img-fluid" />
     </a>
@@ -48,7 +48,7 @@ Let us send out some units:
 
 Now that we have our kingdoms, you can see here, a list of boxes that you can click on to select the number of available units you want to send, each box will tell you how long from that kingdom to the defending kingdom, but underneath the boxes you will see the grand total of time (across all kingdoms) and the total units to send (across all kingdoms)
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/attacking-kingdoms/images/units-selected.png" class="glightbox">
         <img src="/storage/info/attacking-kingdoms/images/units-selected.png" class="img-fluid" />
     </a>
@@ -56,7 +56,7 @@ Now that we have our kingdoms, you can see here, a list of boxes that you can cl
 
 Once you click attack, you can then go to your unit movement section
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/attacking-kingdoms/images/unit-movement.png" class="glightbox">
         <img src="/storage/info/attacking-kingdoms/images/unit-movement.png" class="img-fluid" />
     </a>
@@ -64,7 +64,7 @@ Once you click attack, you can then go to your unit movement section
 
 To see the units in movement. You cancel the unit movement by clicking on the row on the table. If, they are too close to their target they will not be recalled.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/attacking-kingdoms/images/unit-movement-table.png" class="glightbox">
         <img src="/storage/info/attacking-kingdoms/images/unit-movement-table.png" class="img-fluid" />
     </a>
@@ -72,7 +72,7 @@ To see the units in movement. You cancel the unit movement by clicking on the ro
 
 <hr />
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/attacking-kingdoms/images/recall-dialogue.png" class="glightbox">
         <img src="/storage/info/attacking-kingdoms/images/recall-dialogue.png" class="img-fluid" />
     </a>
@@ -82,7 +82,7 @@ Once a kingdom is attacked, and the units return a log will be generated. If you
 
 When you attack a kingdom, you&#39;ll see a global message go out:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/attacking-kingdoms/images/global-message.png" class="glightbox">
         <img src="/storage/info/attacking-kingdoms/images/global-message.png" class="img-fluid" />
     </a>
@@ -90,7 +90,7 @@ When you attack a kingdom, you&#39;ll see a global message go out:
 
 <hr />
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/attacking-kingdoms/images/global-message-with-attack.png" class="glightbox">
         <img src="/storage/info/attacking-kingdoms/images/global-message-with-attack.png" class="img-fluid" />
     </a>
@@ -101,7 +101,7 @@ When you attack a kingdom, you&#39;ll see a global message go out:
 > There will be a server message for you when your units land the attack. If any survive, they will generate a log when they return. In the below image you can see
 > them returning after their attack:
 > 
-> <div class="mb-4">
+> <div class="gallery mb-4">
 >    <a href="/storage/info/attacking-kingdoms/images/units-returning.png" class="glightbox">
 >        <img src="/storage/info/attacking-kingdoms/images/units-returning.png" class="img-fluid" />
 >    </a>
@@ -145,7 +145,7 @@ You get no resources, no gold, no nothing from straight up attacking another kin
 
 Once, the kingdom has been attacked there are two forms of attack logs. One for the defender:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/attacking-kingdoms/images/kingdom-attacked.png" class="glightbox">
         <img src="/storage/info/attacking-kingdoms/images/kingdom-attacked.png" class="img-fluid" />
     </a>
@@ -153,7 +153,7 @@ Once, the kingdom has been attacked there are two forms of attack logs. One for 
 
 If you lost no units in your attack on said kingdom, you will see something like this:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/attacking-kingdoms/images/lost-no-units.png" class="glightbox">
         <img src="/storage/info/attacking-kingdoms/images/lost-no-units.png" class="img-fluid" />
     </a>

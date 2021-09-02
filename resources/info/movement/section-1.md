@@ -1,6 +1,6 @@
 # Movement
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/movement/images/map.png" class="glightbox">
         <img src="/storage/info/movement/images/map.png" class="img-fluid" />
     </a>
@@ -60,7 +60,7 @@ For moving, setting sail, adventuring and teleporting, there is a timeout that h
 - Teleporting is Distanced determined in minutes.
 - [Adventuring](/information/adventure) is determined based on levels * time per level in minutes (or hours).
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/movement/images/timeout.png" class="glightbox">
         <img src="/storage/info/movement/images/timeout.png" class="img-fluid" />
     </a>

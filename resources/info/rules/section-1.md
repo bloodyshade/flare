@@ -46,7 +46,7 @@ The Creator suggests, you leave religion and politics out of the general chat di
 
 You may sometimes see me, The Creator, in chat. You will see messages such as:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/rules/images/creator-chat.png" class="glightbox">
         <img src="/storage/info/rules/images/creator-chat.png" class="img-fluid" />
     </a>
@@ -57,7 +57,7 @@ You may sometimes see me, The Creator, in chat. You will see messages such as:
 Global messages are ones shown to all players. These can include a player finding an item (quest items), being attacked by another players kingdom or even being banned. Global messages are the same size as chat messages, with the exception of banned messages,
 which only show up if the player has banned for ever:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/rules/images/creator-perma-ban.png" class="glightbox">
         <img src="/storage/info/rules/images/creator-perma-ban.png" class="img-fluid" />
     </a>
@@ -72,7 +72,7 @@ which only show up if the player has banned for ever:
 
 If a character name is deemed to be offensive, that is it contains a racial slur or some other offensive slur, **The Creator** can and will initiate a forced name change.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/rules/images/name-change.png" class="glightbox">
         <img src="/storage/info/rules/images/name-change.png" class="img-fluid" />
     </a>

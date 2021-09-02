@@ -5,7 +5,7 @@ The body will always increase stats the most (all your core stats), while weapon
 
 Let’s equip some items. If you do not have any you can head over to shop:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/equipment/images/shop-menu.png" class="glightbox">
         <img src="/storage/info/equipment/images/shop-menu.png" class="img-fluid" />
     </a>
@@ -13,7 +13,7 @@ Let’s equip some items. If you do not have any you can head over to shop:
 
 Or the market:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/equipment/images/market-menu.png" class="glightbox">
         <img src="/storage/info/equipment/images/market-menu.png" class="img-fluid" />
     </a>
@@ -22,7 +22,7 @@ Or the market:
 If you are at a port [location](/information/locations) (blue ship icon) to purchase some gear.
 Once you have some pieces head over to the character sheet:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/equipment/images/inventory-section.png" class="glightbox">
         <img src="/storage/info/equipment/images/inventory-section.png" class="img-fluid" />
     </a>
@@ -30,7 +30,7 @@ Once you have some pieces head over to the character sheet:
 
 Click on the equip tab above your inventory table:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/equipment/images/equipped-section.png" class="glightbox">
         <img src="/storage/info/equipment/images/equipped-section.png" class="img-fluid" />
     </a>
@@ -42,7 +42,7 @@ However, we got us some nice weapons and armour, lets head back to the inventory
 In that dropdown you can choose to destroy the item, or you can equip the item. If the item is already equipped to you, it will appear in the equipped section, allowing you to unequip it.
 Once you selected an item you want to equip, go ahead and click the actions dropdown and click equip to come to the next page, the compare page:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/equipment/images/basic-compare.png" class="glightbox">
         <img src="/storage/info/equipment/images/basic-compare.png" class="img-fluid" />
     </a>
@@ -56,7 +56,7 @@ You generally have two slots for most things, except armor. Two ring slots left 
 
 If an item increases your stats the numbers will be green, you will also see what item you currently have equipped, as you see below:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/equipment/images/increases-stats.png" class="glightbox">
         <img src="/storage/info/equipment/images/increases-stats.png" class="img-fluid" />
     </a>
@@ -64,7 +64,7 @@ If an item increases your stats the numbers will be green, you will also see wha
 
 You will also see any information about skills, such as bonuses and attached affixes, if the item has any.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/equipment/images/attached-affixes.png" class="glightbox">
         <img src="/storage/info/equipment/images/attached-affixes.png" class="img-fluid" />
     </a>
@@ -74,7 +74,7 @@ When you place equipment in an already occupied slot, that item will be replaced
 If an item is worse off then what you have you will see the stats for it go red.
 Some items will let you replace one of two position for that item, in either case the item currently equipped will show as well in the comparison section of the page:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/equipment/images/replacing-on-of-two.png" class="glightbox">
         <img src="/storage/info/equipment/images/replacing-on-of-two.png" class="img-fluid" />
     </a>
@@ -84,7 +84,7 @@ In this case you can replace one of the items and see which one might be better 
 
 > ### ATTN!
 > Some gear might be bad for you, stat wise – even dragging them down, however, if you are looking at crafting lots of items and want the xp bonuses skill bonuses, pay attention to items with affix drops. Here is an example of item that would drag my stats down but see how it has a crafting affix?
-> <div class="mb-4">
+> <div class="gallery mb-4">
 >    <a href="/storage/info/equipment/images/affects-skills.png" class="glightbox">
 >        <img src="/storage/info/equipment/images/affects-skills.png" class="img-fluid" />
 >    </a>

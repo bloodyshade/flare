@@ -10,7 +10,7 @@ To access the market board, you must be at a port location. Which are the blue s
 
 The market board is live updating. Every time someone sells, buys or delists an item, the board updates behind the scenes.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/market-board/images/player-on-port.png" class="glightbox">
         <img src="/storage/info/market-board/images/player-on-port.png" class="img-fluid" />
     </a>
@@ -22,7 +22,7 @@ Players must physically be at one of these ports to access the market board.
 
 Once you are at a port you may head to the menu and select the market:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/market-board/images/market-menu.png" class="glightbox">
         <img src="/storage/info/market-board/images/market-menu.png" class="img-fluid" />
     </a>
@@ -34,7 +34,7 @@ Let's go to: Visit the market.
 >
 > Players who are at a port but in the middle of an adventure cannot access the market. Dead people (that is needing to revive) cannot access the market.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/market-board/images/market-board.png" class="glightbox">
         <img src="/storage/info/market-board/images/market-board.png" class="img-fluid" />
     </a>
@@ -46,7 +46,7 @@ The Market history table is to see the various items sold at various times of da
 
 The Market table below the chart, will show all the items for sale. Clicking on any of them will bring up a popup with the ability to buy the item if it is not yours. As well as see stats about the item.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/market-board/images/purchase-modal.png" class="glightbox">
         <img src="/storage/info/market-board/images/purchase-modal.png" class="img-fluid" />
     </a>
@@ -54,7 +54,7 @@ The Market table below the chart, will show all the items for sale. Clicking on 
 
 Buying an item will alert the seller via the chat box:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/market-board/images/your-item-sold.png" class="glightbox">
         <img src="/storage/info/market-board/images/your-item-sold.png" class="img-fluid" />
     </a>
@@ -68,7 +68,7 @@ Buying an item will alert the seller via the chat box:
 
 Let&#39;s discuss listing an item and head over to Sell Items. See image below:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/market-board/images/market-menu.png" class="glightbox">
         <img src="/storage/info/market-board/images/market-menu.png" class="img-fluid" />
     </a>
@@ -78,7 +78,7 @@ This is where you can sell your items, be it found or crafted or bought from the
 
 To sell an item on the market, click on Sell on Market:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/market-board/images/sell-items.png" class="glightbox">
         <img src="/storage/info/market-board/images/sell-items.png" class="img-fluid" />
     </a>
@@ -94,7 +94,7 @@ Now that your item is listed, what if you want to change the price or delist the
 
 Head over to My Listings.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/market-board/images/my-listings.png" class="glightbox">
         <img src="/storage/info/market-board/images/my-listings.png" class="img-fluid" />
     </a>
@@ -104,7 +104,7 @@ From here you can see your listings. You have the option to edit the price or de
 
 If you edit the price, the item is temporarily removed from the market board. Once you save your edits to the price, the item is put back.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/market-board/images/editing-listing.png" class="glightbox">
         <img src="/storage/info/market-board/images/editing-listing.png" class="img-fluid" />
     </a>
@@ -112,7 +112,7 @@ If you edit the price, the item is temporarily removed from the market board. On
 
 Delisting the item, removes it and places it back in your inventory.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/market-board/images/are-you-sure-delisting.png" class="glightbox">
         <img src="/storage/info/market-board/images/are-you-sure-delisting.png" class="img-fluid" />
     </a>

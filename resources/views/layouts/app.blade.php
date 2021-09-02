@@ -29,6 +29,8 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
+    @stack('css')
+
     @livewireStyles
 
     <script src="{{ asset('js/vendor.js') }}"></script>
@@ -48,7 +50,7 @@
     ])
 
     <main class="workspace">
-        @yield('content');
+        @yield('content')
     </main>
 
 

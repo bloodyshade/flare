@@ -2,7 +2,7 @@
 
 The game comes with a few ways to notify you. One is through the notifications center at the top right of the screen.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/notifications/images/notification.png" class="glightbox">
         <img src="/storage/info/notifications/images/notification.png" class="img-fluid" />
     </a>
@@ -10,7 +10,7 @@ The game comes with a few ways to notify you. One is through the notifications c
 
 As well as notifications that can be in chat:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/notifications/images/server-notification.png" class="glightbox">
         <img src="/storage/info/notifications/images/server-notification.png" class="img-fluid" />
     </a>

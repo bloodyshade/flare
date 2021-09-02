@@ -2,7 +2,12 @@
 
 When you are ready to begin your adventure and you on a location, you can click the Adventure button below the map (assuming that location has an adventure). This will popup another window underneath actions that then allows you to select which adventure, as well as see details about that adventure. 
 
-![adventuring-image](/storage/info/adventure/images/adventuring-modal.png)
+
+<div class="gallery mb-4">
+    <a href="/storage/info/adventure/images/adventuring-modal.png" class="glightbox">
+        <img src="/storage/info/adventure/images/adventuring-modal.png" class="img-fluid" />
+    </a>
+</div>
 
 The same details you saw from clicking on an adventure above, is the same details you'll see in game.
 

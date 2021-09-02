@@ -4,6 +4,7 @@ const forms = require('@tailwindcss/forms');
 const typography = require('@tailwindcss/typography');
 
 module.exports = {
+  mode: 'jit',
   purge: ['./resources/**/*.{js,vue,blade.php,jsx,tsx}'],
   darkMode: "class", // or 'media' or 'class'
   theme: {

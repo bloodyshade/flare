@@ -8,9 +8,9 @@ For optimal game play, it’s suggested that you equip gear that helps boost you
 
 However, as stated before, you should never feel pigeonholed into one specific class or race because “it’s most optimal.” Experiment.
 
-<div class="mb-4">
-    <a href="/storage/info/character-stats/images/character-sheet.png" class="glightbox">
-        <img src="/storage/info/character-stats/images/character-sheet.png" class="img-fluid" />
+<div class="gallery mb-4">
+    <a href="/storage/info/character-stats/images/character-sheet.png">
+        <img src="/storage/info/character-stats/images/character-sheet.png"/>
     </a>
 </div>
 

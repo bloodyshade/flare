@@ -2,13 +2,13 @@
 
 Teleporting works much the same way as setting sail. Assuming you can move and are not dead, you can open the teleport section, by clicking teleport on the map.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/teleport/images/map.png" class="glightbox">
         <img src="/storage/info/teleport/images/map.png" class="img-fluid" />
     </a>
 </div>
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/teleport/images/teleport.png" class="glightbox">
         <img src="/storage/info/teleport/images/teleport.png" class="img-fluid" />
     </a>

@@ -2,7 +2,7 @@
 
 Enchanting, like crafting, is also meant to be easy. There is, however, a slight difference in how its works.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/enchanting/images/enchanting.png" class="glightbox">
         <img src="/storage/info/enchanting/images/enchanting.png" class="img-fluid" />
     </a>
@@ -43,7 +43,7 @@ Here are some examples of messages that can appear:
 
 **Chat is read bottom up**
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/enchanting/images/fail-to-enchant.png" class="glightbox">
         <img src="/storage/info/enchanting/images/fail-to-enchant.png" class="img-fluid" />
     </a>
@@ -51,7 +51,7 @@ Here are some examples of messages that can appear:
 
 In the above, you can see that you have failed to enchant the item.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/enchanting/images/too-easy.png" class="glightbox">
         <img src="/storage/info/enchanting/images/too-easy.png" class="img-fluid" />
     </a>
@@ -59,7 +59,7 @@ In the above, you can see that you have failed to enchant the item.
 
 In the above image you can see that the enchantments are too easy to, thus you get no exp for enchanting this item.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/enchanting/images/one-enchantment-is-too-easy.png" class="glightbox">
         <img src="/storage/info/enchanting/images/one-enchantment-is-too-easy.png" class="img-fluid" />
     </a>

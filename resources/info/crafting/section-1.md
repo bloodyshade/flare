@@ -14,7 +14,7 @@ You will craft at least 10 to a maximum of 20 items with no bonuses before being
 
 Failing to craft the item will cost you the gold you need to craft the item, and you'll get no experience points.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/crafting/images/crafting.png" class="glightbox">
         <img src="/storage/info/crafting/images/crafting.png" class="img-fluid" />
     </a>
@@ -41,7 +41,7 @@ Gaining levels increases your skill bonus, which increases the odds of the item 
 
 Chat will inform you of success/failure and gold deficiency when it comes to crafting.
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/crafting/images/crafting-message.png" class="glightbox">
         <img src="/storage/info/crafting/images/crafting-message.png" class="img-fluid" />
     </a>

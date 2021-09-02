@@ -2,7 +2,7 @@
 
 Locations in the game can show up as three icons:
 
-<div class="mb-4">
+<div class="gallery mb-4">
     <a href="/storage/info/locations/images/map.png" class="glightbox">
         <img src="/storage/info/locations/images/map.png" class="img-fluid" />
     </a>
