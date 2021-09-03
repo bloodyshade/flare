@@ -44,14 +44,14 @@ class RewardBuilder {
      * @param Adventure $adventure
      * @return mixed Item | null
      */
-    public function fetchDrops(Monster $monster, Character $character, Adventure $adventure) {
+    public function fetchDrops(Monster $monster, Character $character, Adventure $adventure, float $gameMapBonus) {
         $lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
 
-        $hasDrop = DropCheckCalculator::fetchDropCheckChance($monster, $lootingChance, $adventure);
+        $hasDrop = DropCheckCalculator::fetchDropCheckChance($monster, $lootingChance, $gameMapBonus, $adventure);
 
         if ($hasDrop) {
             return resolve(RandomItemDropBuilder::class)
-                        ->setItemAffixes(ItemAffix::all())
+                        ->setItemAffixes(ItemAffix::where('can_drop', true)->get())
                         ->generateItem($character);
         }
 
@@ -67,11 +67,11 @@ class RewardBuilder {
      * @param array $rewards
      * @return mixed|null
      */
-    public function fetchQuestItemFromMonster(Monster $monster, Character $character, Adventure $adventure, array $rewards) {
+    public function fetchQuestItemFromMonster(Monster $monster, Character $character, Adventure $adventure, array $rewards, float $gameMapBonus) {
         if (!is_null($monster->questItem)) {
             $lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
 
-            $hasDrop = DropCheckCalculator::fetchQuestItemDropCheck($monster, $lootingChance, $adventure);
+            $hasDrop = DropCheckCalculator::fetchQuestItemDropCheck($monster, $lootingChance, $gameMapBonus, $adventure);
 
             $hasItem = $character->inventory->slots->filter(function($slot) use ($monster) {
                 return $slot->item_id === $monster->questItem->id;
@@ -95,11 +95,11 @@ class RewardBuilder {
      * @param Adventure $adventure
      * @return int
      */
-    public function fetchGoldRush(Monster $monster, Character $character, Adventure $adventure): int {
+    public function fetchGoldRush(Monster $monster, Character $character, Adventure $adventure, float $gameMapBonus = 0.0): int {
 
         $lootingChance = $character->skills->where('name', 'Looting')->first()->skill_bonus;
 
-        $hasGoldRush = GoldRushCheckCalculator::fetchGoldRushChance($monster, $lootingChance, $adventure);
+        $hasGoldRush = GoldRushCheckCalculator::fetchGoldRushChance($monster, $lootingChance, $gameMapBonus, $adventure);
 
         if ($hasGoldRush) {
             return $monster->gold + rand(0, 1000);

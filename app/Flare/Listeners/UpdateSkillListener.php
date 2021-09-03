@@ -21,8 +21,16 @@ class UpdateSkillListener
             return;
         }
 
+        $gameMap = $event->skill->character->map->gameMap;
+
+        $skillXP = SkillXPCalculator::fetchSkillXP($event->skill, $event->adventure, $event->monster);
+
+        if (!is_null($gameMap->skill_training_bonus)) {
+            $skillXP = $skillXP + $skillXP * $gameMap->skill_training_bonus;
+        }
+
         $event->skill->update([
-            'xp' => $event->skill->xp + SkillXPCalculator::fetchSkillXP($event->skill, $event->adventure),
+            'xp' => $event->skill->xp + $skillXP,
         ]);
 
         $skill = $event->skill->refresh();
@@ -32,7 +40,7 @@ class UpdateSkillListener
 
             $skill->update([
                 'level'              => $level,
-                'xp_max'             => $skill->can_train ? rand(100, 150) : rand(150, 300),
+                'xp_max'             => $skill->can_train ? rand(150, 350) : rand(100, 250),
                 'base_damage_mod'    => $skill->base_damage_mod + $skill->baseSkill->base_damage_mod_bonus_per_level,
                 'base_healing_mod'   => $skill->base_healing_mod + $skill->baseSkill->base_healing_mod_bonus_per_level,
                 'base_ac_mod'        => $skill->base_ac_mod + $skill->baseSkill->base_ac_mod_bonus_per_level,

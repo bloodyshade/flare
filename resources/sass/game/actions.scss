@@ -1,0 +1,118 @@
+.health-meters {
+  max-width: 300px;
+  margin: 0 auto;
+
+  .character {
+    .character-bar {
+      background-color: #41840f;
+    }
+  }
+
+  .monster {
+    .monster-bar {
+      background-color: #840f15;
+    }
+  }
+}
+
+.monster-select {
+  @media only screen and (max-width: 768px) {
+    margin-top: 10px;
+    margin-bottom: 10px
+  }
+}
+
+.character-timeout {
+  float: left;
+  margin-top: -10px;
+  margin-left: -20px;
+
+  .timer {
+    font-size: 12px;
+  }
+}
+
+.crafting-timeout {
+  position: relative;
+  top: 5px;
+  left: -45px;
+
+  .timer {
+    font-size: 12px;
+  }
+}
+
+.transmute-timeout {
+  position: relative;
+  top: 5px;
+  left: -30px;
+
+  .timer {
+    font-size: 12px;
+  }
+}
+
+.enchanting-ready {
+  position: relative;
+  left: -20px;
+}
+
+.enchanting-timeout {
+  position: relative;
+  top: -10px;
+  left: -20px;
+}
+
+.character-ready {
+  position: relative;
+  left: -20px;
+}
+
+.crafting-ready {
+  position: relative;
+  top: 15px;
+  left: -45px;
+}
+
+.character-map-timeout {
+  float: left;
+  margin-top: -6px;
+
+  .timer {
+    font-size: 12px;
+  }
+}
+
+.adventure-timeout-bar {
+  position: relative;
+  left: -20px;
+  top: -8px;
+}
+
+.celestial-fight-actions {
+  max-width: 155px;
+  margin: 0 auto;
+}
+
+.celestial-dead-actions {
+  max-width: 255px;
+  margin: 0 auto;
+}
+
+@include media-breakpoint-down(lg) {
+  .crafting-timeout {
+    top: 10px;
+    left: 20px;
+  }
+
+  .crafting-ready {
+    top: 15px;
+    left: 20px;
+  }
+
+  .character-timeout {
+    margin-right: 0px;
+  }
+}
+
+

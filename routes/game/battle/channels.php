@@ -25,3 +25,13 @@ Broadcast::channel('update-actions-{userId}', function ($user, $userId) {
 Broadcast::channel('update-character-attack-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
+
+// When a character makes an attack on a celestial entity.
+Broadcast::channel('update-celestial-fight-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
+// When the Celestial Fight Details Change:
+Broadcast::channel('celestial-fight-changes', function ($user) {
+    return $user;
+});

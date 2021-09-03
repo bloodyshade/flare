@@ -36,14 +36,18 @@ class ServerMessageBuilder {
             case 'cannot_move_up':
                 return 'You cannot go that way.';
             case 'cannot_walk_on_water':
-                return 'You cannot walk on water without a Flask of Fresh Air.';
+                return 'You cannot move that way, you are missing the appropriate quest item.';
             case 'not_enough_gold':
-                return 'You dont have enough gold for that.';
+                return 'You dont have enough Gold for that.';
+            case 'not_enough_gold_dust':
+                return 'You dont have enough Gold Dust for that.';
+            case 'not_enough_shards':
+                return 'You dont have enough Shards for that.';
             case 'cant_enchant':
             case 'cant_craft':
                 return 'You must wait for the timer (beside Craft/Enchant) to state: Ready!';
             case 'to_hard_to_craft':
-                return 'You lost your investment and epically failed to craft this item.';
+                return 'You are too low level and thus, you lost your investment and epically failed to craft this item!';
             case 'to_easy_to_craft':
                 return 'This is far too easy to craft! You will get no experience for this item.';
             case 'something_went_wrong':
@@ -54,6 +58,8 @@ class ServerMessageBuilder {
                 return 'You can only chat so much in a one minute window. Slow down!';
             case 'message_length_max':
                 return 'Your message is far too long.';
+            case 'no_matching_command':
+                return 'The NPC does not understand you. Their eyes blink in confusion.';
             default:
                 return '';
         }

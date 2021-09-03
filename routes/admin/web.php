@@ -2,14 +2,20 @@
 
 Route::get('/affixes/{affix}', ['as' => 'game.affixes.affix', 'uses' => 'AffixesController@show']);
 Route::get('/game/adventures/{adventure}', ['as' => 'game.adventures.adventure', 'uses' => 'AdventuresController@show']);
+Route::get('/game/locations/{location}', ['as' => 'game.locations.location', 'uses' => 'Location@show']);
 Route::get('/game/kingdoms/units/{gameUnit}', ['as' => 'game.units.unit', 'uses' => 'UnitsController@show']);
 Route::get('/game/kingdoms/buildings/{building}', ['as' => 'game.buildings.building', 'uses' => 'BuildingsController@show']);
+Route::get('/game/quests/{quest}', ['as' => 'game.quests.show', 'uses' => 'QuestsController@show']);
+Route::get('/game/npcs/{npc}', ['as' => 'game.npcs.show', 'uses' => 'NpcsController@show']);
 
 Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin', ['as' => 'home', 'uses' => 'AdminController@home']);
     Route::get('/admin/maps', ['as' => 'maps', 'uses' => 'MapsController@index']);
+    Route::get('/admin/maps/{gameMap}/add-bonuses', ['as' => 'map.bonuses', 'uses' => 'MapsController@createBonuses']);
+    Route::get('/admin/maps/{gameMap}/view-bonuses', ['as' => 'view.map.bonuses', 'uses' => 'MapsController@viewBonuses']);
     Route::get('/admin/maps/upload', ['as' => 'maps.upload', 'uses' => 'MapsController@uploadMap']);
     Route::post('/admin/maps/process-upload', ['as' => 'upload.map', 'uses' => 'MapsController@upload']);
+    Route::post('/admin/maps/{gameMap}/post-bonuses', ['as' => 'add.map.bonuses', 'uses' => 'MapsController@postBonuses']);
 
     Route::get('/admin/locations', ['as' => 'locations.list', 'uses' => 'LocationsController@index']);
     Route::get('/admin/locations/create', ['as' => 'locations.create', 'uses' => 'LocationsController@create']);
@@ -69,6 +75,11 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/users/{user}/ingore-unban-request', ['as' => 'user.ignore.unban.request', 'uses' => 'UsersController@ignoreUnBanRequest']);
     Route::post('/admin/users/{user}/force-name-change', ['as' => 'user.force.name.change', 'uses' => 'UsersController@forceNameChange']);
 
+    Route::get('/admin/skills/export-skills', ['as' => 'skills.export', 'uses' => 'SkillsController@exportSkills']);
+    Route::get('/admin/skills/import-skills', ['as' => 'skills.import', 'uses' => 'SkillsController@importSkills']);
+    Route::post('/admin/skills/export-data', ['as' => 'skills.export-data', 'uses' => 'SkillsController@export']);
+    Route::post('/admin/skills/import-data', ['as' => 'skills.import-data', 'uses' => 'SkillsController@importData']);
+
     Route::get('/admin/skills', ['as' => 'skills.list', 'uses' => 'SkillsController@index']);
     Route::get('/admin/skill/{skill}', ['as' => 'skills.skill', 'uses' => 'SkillsController@show']);
     Route::get('/admin/skills/create', ['as' => 'skills.create', 'uses' => 'SkillsController@create']);
@@ -83,19 +94,6 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/classes/create', ['as' => 'classes.create', 'uses' => 'ClassesController@create']);
     Route::get('/admin/classes/{class}', ['as' => 'classes.class', 'uses' => 'ClassesController@show']);
     Route::get('/admin/classes/{class}/edit', ['as' => 'classes.edit', 'uses' => 'ClassesController@edit']);
-
-    Route::get('/admin/character-modeling', ['as' => 'admin.character.modeling', 'uses' => 'CharacterModelingController@index']);
-    Route::get('/admin/character-modeling/sheet/{character}', ['as' => 'admin.character.modeling.sheet', 'uses' => 'CharacterModelingController@fetchSheet']);
-    Route::get('/admin/character-modeling/{monster}/monster-data', ['as' => 'admin.character.modeling.monster-data', 'uses' => 'CharacterModelingController@monsterData']);
-    Route::get('/admin/character-modeling/{adventure}/adventure-data', ['as' => 'admin.character.modeling.adventure-data', 'uses' => 'CharacterModelingController@adventureData']);
-    Route::get('/admin/character-modeling/battle-results/{characterSnapShot}', ['as' => 'admin.character.modeling.battle-simmulation.results', 'uses' => 'CharacterModelingController@battleResults']);
-    Route::get('/admin/character-modeling/adventure-results/{characterSnapShot}', ['as' => 'admin.character.modeling.adventure-simmulation.results', 'uses' => 'CharacterModelingController@adventureResults']);
-    Route::post('/admin/character-modeling/reset-inventory/{character}', ['as' => 'admin.character.modeling.reset-inventory', 'uses' => 'CharacterModelingController@resetInventory']);
-    Route::post('/admin/character-modeling/assign-item/{character}', ['as' => 'admin.character-modeling.assign-item', 'uses' => 'CharacterModelingController@assignItem']);
-    Route::post('/admin/character-modeling/assign-all/{character}', ['as' => 'admin.character-modeling.assign-all', 'uses' => 'CharacterModelingController@assignAll']);
-    Route::post('/admin/character-modeling/{character}/apply-snap-shot', ['as' => 'admin.character.modeling.assign-snap-shot', 'uses' => 'CharacterModelingController@applySnapShot']);
-    Route::post('/admin/character-modeling/generate', ['as' => 'admin.character.modeling.generate', 'uses' => 'CharacterModelingController@generate']);
-    Route::post('/admin/character-modeling/test', ['as' => 'admin.character.modeling.test', 'uses' => 'CharacterModelingController@test']);
 
     Route::get('/admin/kingdoms/buildings/create', ['as' => 'buildings.create', 'uses' => 'BuildingsController@create']);
     Route::get('/admin/kingdoms/buildings', ['as' => 'buildings.list', 'uses' => 'BuildingsController@index']);
@@ -112,4 +110,25 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/kingdoms/export-data', ['as' => 'kingdoms.export-data', 'uses' => 'KingdomsController@export']);
     Route::post('/admin/kingdoms/import-data', ['as' => 'kingdoms.import-data', 'uses' => 'KingdomsController@importData']);
 
+    Route::get('/admin/npcs/export-npcs', ['as' => 'npcs.export', 'uses' => 'NpcsController@exportNpcs']);
+    Route::get('/admin/npcs/import-npcs', ['as' => 'npcs.import', 'uses' => 'NpcsController@importNpcs']);
+    Route::post('/admin/npcs/export-data', ['as' => 'npcs.export-data', 'uses' => 'NpcsController@export']);
+    Route::post('/admin/npcs/import-data', ['as' => 'npcs.import-data', 'uses' => 'NpcsController@import']);
+
+    Route::get('/admin/npcs/index', ['as' => 'npcs.index', 'uses' => 'NpcsController@index']);
+    Route::get('/admin/npcs/create', ['as' => 'npcs.create', 'uses' => 'NpcsController@create']);
+    Route::get('/admin/npcs/edit/{npc}', ['as' => 'npcs.edit', 'uses' => 'NpcsController@edit']);
+    Route::get('/admin/npcs/{npc}', ['as' => 'npcs.show', 'uses' => 'NpcsController@show']);
+
+    Route::get('/admin/quests/export-quests', ['as' => 'quests.export', 'uses' => 'QuestsController@exportQuests']);
+    Route::get('/admin/quests/import-quests', ['as' => 'quests.import', 'uses' => 'QuestsController@importQuests']);
+    Route::post('/admin/quests/export-data', ['as' => 'quests.export-data', 'uses' => 'QuestsController@export']);
+    Route::post('/admin/quests/import-data', ['as' => 'quests.import-data', 'uses' => 'QuestsController@import']);
+
+    Route::get('/admin/quests/index', ['as' => 'quests.index', 'uses' => 'QuestsController@index']);
+    Route::get('/admin/quests/create', ['as' => 'quests.create', 'uses' => 'QuestsController@create']);
+    Route::get('/admin/quests/edit/{quest}', ['as' => 'quests.edit', 'uses' => 'QuestsController@edit']);
+    Route::get('/admin/quests/{quest}', ['as' => 'quests.show', 'uses' => 'QuestsController@show']);
+
+    Route::get('/admin/statistics/dashboard', ['as' => 'admin.statistics', 'uses' => 'StatisticsController@index']);
 });

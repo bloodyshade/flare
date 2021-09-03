@@ -3,13 +3,16 @@
 namespace App\Game\Kingdoms\Handlers;
 
 use App\Flare\Events\KingdomServerMessageEvent;
+use App\Flare\Jobs\SendOffEmail;
 use App\Flare\Mail\GenericMail;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
+use App\Flare\Models\Npc;
 use App\Flare\Models\UnitMovementQueue;
 use App\Flare\Models\User;
 use App\Flare\Values\KingdomLogStatusValue;
+use App\Flare\Values\NpcTypes;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Facades\App\Flare\Values\UserOnlineValue;
 
@@ -77,10 +80,10 @@ class NotifyHandler {
     /**
      * Sets the defending character.
      *
-     * @param Character $character
+     * @param Character|null $character
      * @return $this
      */
-    public function setDefendingCharacter(Character $character): NotifyHandler {
+    public function setDefendingCharacter(Character $character = null): NotifyHandler {
         $this->defendingCharacter = $character;
 
         return $this;
@@ -146,16 +149,21 @@ class NotifyHandler {
      * @throws \Exception
      */
     public function notifyDefender(string $status, Kingdom $defender) {
+        if (is_null($defender->character_id) || is_null($this->defendingCharacter)) {
+            return;
+        }
 
         $value = new KingdomLogStatusValue($status);
 
-        KingdomLog::create([
+        $attackLog = KingdomLog::create([
             'character_id'    => $this->defendingCharacter->id,
             'status'          => $status,
             'to_kingdom_id'   => $this->defendingKingdom->id,
             'from_kingdom_id' => $this->attackingKingdom->id,
             'old_defender'    => $value->lostKingdom() ? [] : $this->oldDefender,
-            'new_defender'    => $value->lostKingdom() ? [] :$this->newDefender,
+            'new_defender'    => $value->lostKingdom() ? [] : (is_null($this->newDefender) ? $defender : $this->newDefender),
+            'units_sent'       => $this->sentUnits,
+            'units_survived'  => $this->survivingUnits,
             'published'       => true,
         ]);
 
@@ -190,7 +198,6 @@ class NotifyHandler {
      * @param Character $character
      */
     public function notifyAttacker(string $status, Kingdom $defender, Character $character) {
-
         $logStatus = new KingdomLogStatusValue($status);
 
         if (!$logStatus->unitsReturning()) {
@@ -203,6 +210,7 @@ class NotifyHandler {
                 'units_sent' => $this->sentUnits,
                 'units_survived' => $this->survivingUnits,
                 'old_defender' => $this->oldDefender,
+                'new_defender' => is_null($this->newDefender) ? $defender->toArray() : $this->newDefender,
                 'published' => ($logStatus->lostAttack() || $logStatus->tookKingdom()),
             ]);
         }
@@ -212,7 +220,7 @@ class NotifyHandler {
         $type    = '';
 
         if ($logStatus->attackedKingdom()) {
-            $message = 'You landed for  kingdom at: (X/Y) ' .
+            $message = 'You landed an attack on a kingdom at: (X/Y) ' .
                 $defender->x_position . '/' . $defender->y_position .
                 ' on the ' . $mapName . ' plane.';
 
@@ -220,7 +228,7 @@ class NotifyHandler {
         }
 
         if ($logStatus->lostAttack()) {
-            $message = 'You lost all your units when attacking kingdom at: (X/Y) ' .
+            $message = 'You lost all your units when attacking '.$defender->name.' at: (X/Y) ' .
                 $defender->x_position . '/' . $defender->y_position .
                 ' on the ' . $mapName . ' plane. Check the kingdom attack logs for more info.';
 
@@ -230,6 +238,10 @@ class NotifyHandler {
         if ($logStatus->tookKingdom()) {
             $characterName = $defender->character->name;
 
+            if ($this->oldDefender['npc_owned']) {
+                $characterName = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first()->real_name;
+            }
+
             $message = 'You have taken ' . $characterName . '\'s kingdom at (X\Y) ' . $defender->x_position . '/' . $defender->y_position .
                 ' on the ' . $mapName . ' plane. Any surviving units have been added to the kingdoms units. Check the kingdom attack logs for more info.';
 
@@ -237,13 +249,20 @@ class NotifyHandler {
         }
 
         if ($logStatus->unitsReturning()) {
-            $characterName = $defender->character->name;
+            if (is_null($defender->character_id)) {
+                $characterName = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first()->real_name;
+            } else {
+                $characterName = $defender->character->name;
+            }
+
 
             $message = 'Your units are retuning from ' . $characterName . '\'s kingdom at (X\Y) ' . $defender->x_position . '/' . $defender->y_position .
                 ' on the ' . $mapName . ' plane. When they are back a log will be generated with details';
 
-            if ($defender->character->id === $character->id) {
-                $message = 'Your units are returning from: (X\Y) ' . $defender->x_position . '/' . $defender->y_position . '. You own this kingdom.';
+            if (!is_null($defender->character_id)) {
+                if ($defender->character->id === $character->id) {
+                    $message = 'Your units are returning from: (X\Y) ' . $defender->x_position . '/' . $defender->y_position . '. You own this kingdom.';
+                }
             }
 
             $type = 'units-returning';
@@ -259,9 +278,16 @@ class NotifyHandler {
      * @param Character $character
      */
     public function kingdomHasFallenMessage(Character $character) {
+        $map          = $character->map->gameMap->name;
+        
+        if (is_null($this->defendingCharacter)) {
+            $defenderName = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first()->real_name;
+        } else {
+            $defenderName = $this->defendingCharacter->name;
+        }
 
-        $message = $this->defendingCharacter->name . '\'s kingdom on the ' .
-            $this->defendingCharacter->map->gameMap->name . ' plane, has fallen! ' .
+        $message = $defenderName. '\'s kingdom on the ' .
+            $map . ' plane, has fallen! ' .
             $character->name . ' is now the rightful ruler!';
 
         broadcast(new GlobalMessageEvent($message));
@@ -275,12 +301,14 @@ class NotifyHandler {
      * @param string $message
      * @return array|void|null
      */
-    protected function sendMessage(User $user, $type, string $message) {
-        if (!UserOnlineValue::isOnline($user)) {
+    public function sendMessage(User $user, $type, string $message) {
+        if (!UserOnlineValue::isOnline($user) && $user->kingdom_attack_email) {
             $subjectParts = explode('-', $type);
             $subject      = ucfirst($subjectParts[0]) . ' ' . ucfirst($subjectParts[1]) . '!';
 
-            return \Mail::to($user->email)->send((new GenericMail($user, $message, $subject)));
+            SendOffEmail::dispatch($user, (new GenericMail($user, $message, $subject)))->delay(now()->addMinute());
+
+            return;
         }
 
         return event(new KingdomServerMessageEvent($user, $type, $message));

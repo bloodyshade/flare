@@ -1,10 +1,10 @@
 <dl>
     <dt>Base Damage:</dt>
-    <dd>{{$item->getTotalDamage()}} <em>(With all modifiers)</em></dd>
+    <dd class="{{$item->getTotalDamage() > 0 ? 'text-success' : ''}}">{{$item->getTotalDamage()}} <em>(With all modifiers)</em></dd>
     <dt>Base AC:</dt>
-    <dd>{{$item->getTotalDefence()}} <em>(With all modifiers)</em></dd>
+    <dd class="{{$item->getTotalDefence() > 0 ? 'text-success' : ''}}">{{$item->getTotalDefence()}} <em>(With all modifiers)</em></dd>
     <dt>Base Healing:</dt>
-    <dd>{{$item->getTotalHealing()}} <em>(With all modifiers)</em></dd>
+    <dd class="{{$item->getTotalHealing() > 0 ? 'text-success' : ''}}">{{$item->getTotalHealing()}} <em>(With all modifiers)</em></dd>
     <dt>Type:</dt>
     <dd>{{$item->type}}</dd>
 
@@ -18,31 +18,33 @@
                 @case('labyrinth')
                     Access Labyrinth Plane
                     @break
+                @case('dungeon')
+                    Access Dungeons Plane
+                @break
                 @default
                     N/A
             @endswitch
         </dd>
     @endif
-
-    <dt>Skill Name:</dt>
-    <dd>{{is_null($item->skill_name) ? 'N/A' : $item->skill_name}}</dd>
-    <dt>Skill XP Bonus (When Training):</dt>
-    <dd>{{is_null($item->skill_name) ? 0 : $item->skill_training_bonus * 100}}%</dd>
-    <dt>Skill Bonus (When using)</dt>
-    <dd>{{is_null($item->skill_training_bonus) ? 0 : $item->skill_bonus * 100}}%</dd>
 </dl>
 
 @if ($item->can_craft)
-<h4 class="mt-3">Crafting Info</h4>
-<hr />
-<dl>
-    <dt>Crafting Type</dt>
-    <dd>{{$item->crafting_type}}</dd>
-    <dt>Skill Level Required</dt>
-    <dd>{{$item->skill_level_required}}</dd>
-    <dt>Skill Level Trivial</dt>
-    <dd>{{$item->skill_level_trivial}}</dd>
-</dl>
+    <h4 class="mt-3">Crafting Info</h4>
+    <hr />
+    <dl>
+        <dt>Crafting Type</dt>
+        <dd>{{$item->crafting_type}}</dd>
+        <dt>Skill Level Required</dt>
+        <dd>{{$item->skill_level_required}}</dd>
+        <dt>Skill Level Trivial</dt>
+        <dd>{{$item->skill_level_trivial}}</dd>
+        <dt>Gold Cost:</dt>
+        <dd>{{number_format($item->cost)}}</dd>
+        <dt>God Dust Cost:</dt>
+        <dd>{{!is_null($item->gold_dust_cost) ? number_format($item->gold_dust_cost) : 0}}</dd>
+        <dt>Shards Cost:</dt>
+        <dd>{{!is_null($item->shards_cost) ? $item->shards_cost : 0}}</dd>
+    </dl>
 @endif
 
 @if (!empty($item->getItemSkills()))

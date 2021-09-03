@@ -65,6 +65,37 @@ class KingdomAttackedBuilder {
         return $buildingChanges;
     }
 
+    public function fetchUnitKillReport(): array {
+        $oldUnits = $this->log->units_sent;
+        $unitsSurvived = $this->log->units_survived;
+
+        $unitLosses = [];
+
+        if (is_null($oldUnits)) {
+         return $unitLosses;
+        }
+
+        foreach ($oldUnits as $index => $unit) {
+            $amountLeft = $unitsSurvived[$index]['amount'];
+
+            if ($amountLeft > 0) {
+                if ($amountLeft === $unit['amount']) {
+                    $amountLeft = 0.0;
+                } else {
+                    $amountLeft = number_format($amountLeft / $unit['amount'], 2);
+                }
+            } else {
+                $amountLeft = 1.0;
+            }
+
+            $unitLosses[GameUnit::find($unit['unit_id'])->name] = [
+                'amount_killed' => $amountLeft,
+            ];
+        }
+
+        return $unitLosses;
+    }
+
     public function fetchUnitDamageReport(): array {
         $oldDefenderUnits = $this->log->old_defender['units'];
         $newDefenderUnits = $this->log->new_defender['units'];
@@ -88,7 +119,7 @@ class KingdomAttackedBuilder {
                 $percentage = 1 - ($newAmount / $oldAmount);
 
                 $unitChanges[$unitName] = [
-                    'lost_all'    => true,
+                    'lost_all'    => $percentage <= 0.0,
                     'old_amount'  => $oldAmount,
                     'new_amount'  => $newAmount,
                     'lost'        => number_format($percentage, 2),

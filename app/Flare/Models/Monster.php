@@ -27,6 +27,8 @@ class Monster extends Model
         'dex',
         'chr',
         'int',
+        'agi',
+        'focus',
         'ac',
         'gold',
         'max_level',
@@ -37,6 +39,16 @@ class Monster extends Model
         'quest_item_drop_chance',
         'published',
         'game_map_id',
+        'is_celestial_entity',
+        'gold_cost',
+        'gold_dust_cost',
+        'can_cast',
+        'can_use_artifacts',
+        'max_spell_damage',
+        'max_artifact_damage',
+        'spell_evasion',
+        'artifact_annulment',
+        'shards',
     ];
 
     /**
@@ -57,6 +69,16 @@ class Monster extends Model
         'max_level'              => 'integer',
         'quest_item_drop_chance' => 'float',
         'published'              => 'boolean',
+        'is_celestial_entity'    => 'boolean',
+        'gold_cost'              => 'integer',
+        'gold_dust_cost'         => 'integer',
+        'can_cast'               => 'boolean',
+        'can_use_artifacts'      => 'boolean',
+        'max_spell_damage'       => 'integer',
+        'max_artifact_damage'    => 'integer',
+        'shards'                 => 'integer',
+        'spell_evasion'          => 'decimal:4',
+        'artifact_annulment'     => 'decimal:4',
     ];
 
     public function skills() {
@@ -74,5 +96,5 @@ class Monster extends Model
     protected static function newFactory() {
         return MonsterFactory::new();
     }
-    
+
 }

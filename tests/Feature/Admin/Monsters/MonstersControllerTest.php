@@ -8,6 +8,7 @@ use App\Flare\Models\Monster;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Tests\TestCase;
+use Tests\Traits\CreateItem;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateMonster;
@@ -28,7 +29,7 @@ class MonstersControllerTest extends TestCase
 
         $role = $this->createAdminRole();
 
-        $this->user = $this->createAdmin([], $role);
+        $this->user = $this->createAdmin($role, []);
 
         $this->createMonster();
     }
@@ -62,13 +63,13 @@ class MonstersControllerTest extends TestCase
 
     public function testCanSeeShowPage() {
         $this->actingAs($this->user)->visit(route('monsters.monster', [
-            'monster' => 1
+            'monster' => Monster::first()->id
         ]))->see(Monster::first()->name);
     }
 
     public function testCanSeeEditPage() {
         $this->actingAs($this->user)->visit(route('monster.edit', [
-            'monster' => 1
+            'monster' => Monster::first()->id
         ]))->see(Monster::first()->name);
     }
 
@@ -80,10 +81,12 @@ class MonstersControllerTest extends TestCase
         $this->assertTrue($monster->refresh()->published);
     }
 
-    public function testCanExportItems() {
-        Excel::fake();
-
+    public function testCanSeeExportPage() {
         $this->actingAs($this->user)->visit(route('monsters.export'))->see('Export');
+    }
+
+    public function testCanExportMonsters() {
+        Excel::fake();
 
         $this->actingAs($this->user)->post(route('monsters.export-data'));
 
@@ -92,7 +95,7 @@ class MonstersControllerTest extends TestCase
         });
     }
 
-    public function testCanSeeImportPage() {
+    public function testCanSeeMonsterImportPage() {
         $this->actingAs($this->user)->visit(route('monsters.import'))->see('Import Monster Data');
     }
 

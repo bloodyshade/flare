@@ -1,6 +1,4 @@
-@extends('layouts.information', [
-    'pageTitle' => 'Class'
-])
+@extends('layouts.information')
 
 @section('content')
     <div class="mt-3">
@@ -9,7 +7,7 @@
             link="Back"
             color="primary"
         >
-        <x-item-display-color :item="$item" />
+            <x-item-display-color :item="$item" />
         </x-core.page-title-slot>
         <hr />
         @if ($item->market_sellable)

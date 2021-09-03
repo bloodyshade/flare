@@ -10,10 +10,12 @@ use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Traits\CreateAdventure;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemAffix;
 
 class AdventureJobTest extends TestCase
 {
-    use RefreshDatabase, CreateAdventure;
+    use RefreshDatabase, CreateAdventure, CreateItemAffix, CreateItem;
 
     public function setUp(): void {
         parent::setUp();
@@ -21,10 +23,14 @@ class AdventureJobTest extends TestCase
 
     public function testAdventureJob()
     {
+        $this->createItemAffix();
+        $this->createItem();
+
         $adventure = $this->createNewAdventure();
 
         $character = (new CharacterFactory)->createBaseCharacter()
                                          ->createAdventureLog($adventure)
+                                         ->givePlayerLocation()
                                          ->getCharacter();
 
         Event::fake();
@@ -32,16 +38,16 @@ class AdventureJobTest extends TestCase
         $jobName = Str::random(80);
 
         Cache::put('character_'.$character->id.'_adventure_'.$adventure->id, $jobName, now()->addMinutes(5));
-        
+
         for ($i = 1; $i <= $adventure->levels; $i++) {
             AdventureJob::dispatch($character, $adventure, $jobName, $i);
 
-            $character->refresh();
+            $character = $character->refresh();
 
             $this->assertTrue(!empty($character->adventureLogs->first()->logs));
-        
+
         }
-        
+
     }
 
     public function testAdventureJobDoesNotExecuteWhenNameDoesntMatch()

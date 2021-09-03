@@ -14,13 +14,19 @@ class DataTable extends Component
 
     public $affixId = null;
 
-    public $search       = '';
-    public $sortField    = 'type';
-    public $perPage      = 10;
-    public $only         = null;
-    public $character    = null;
-    public $isHelp       = false;
-    public $type         = null;
+    public $search                = '';
+    public $sortField             = 'cost';
+    public $perPage               = 10;
+    public $only                  = null;
+    public $character             = null;
+    public $isHelp                = false;
+    public $craftOnly             = false;
+    public $type                  = null;
+    public $showSkillInfo         = false;
+    public $showDropDown          = false;
+    public $showAlchemy           = true;
+    public $showOtherCurrencyCost = true;
+
 
     protected $paginationTheme = 'bootstrap';
 
@@ -29,12 +35,16 @@ class DataTable extends Component
     }
 
     public function getDataQueryProperty() {
+        if ($this->search !== '') {
+            $this->page = 1;
+        }
 
         $items = Item::dataTableSearch($this->search);
 
         if (!is_null($this->only)) {
             if ($this->only === 'quest-items-book') {
-                $items = $items->where('name', 'like', '%Book%');
+                $items = $items->where('name', 'like', '%Book%')
+                               ->where('type', 'quest');
             } else {
                 $items = $items->where('type', '!=', 'quest');
             }
@@ -59,12 +69,16 @@ class DataTable extends Component
 
         $items = $items->where('type', '!=', 'quest')
                        ->where('item_suffix_id', null)
-                       ->where('item_prefix_id', null);
+                       ->where('item_prefix_id', null)
+                       ->where('craft_only', $this->craftOnly);
 
         if (!is_null($this->type)) {
             $items = $items->where('type', $this->type);
+        } else if ($this->craftOnly && $this->type !== 'alchemy') {
+            $items = $items->where('type', '!=', 'alchemy');
         }
 
+        $this->showAlchemy = false;
 
         return $items->orderBy($this->sortField, $this->sortBy);
     }

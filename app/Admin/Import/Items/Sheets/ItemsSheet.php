@@ -45,6 +45,38 @@ class ItemsSheet implements ToCollection {
     protected function returnCleanItem(array $item) {
         $cleanData = [];
 
+        if (!isset($item['can_drop'])) {
+            $item['can_drop'] = false;
+        }
+
+        if (!isset($item['market_sellable'])) {
+            $item['market_sellable'] = false;
+        }
+
+        if (!isset($item['usable'])) {
+            $item['usable'] = false;
+        }
+
+        if (!isset($item['damages_kingdoms'])) {
+            $item['damages_kingdoms'] = false;
+        }
+
+        if (!isset($item['stat_increase'])) {
+            $item['stat_increase'] = false;
+        }
+
+        if (!isset($item['can_craft'])) {
+            $item['can_craft'] = false;
+        }
+
+        if (!isset($item['craft_only'])) {
+            $item['craft_only'] = false;
+        }
+
+        if (!isset($item['can_resurrect'])) {
+            $item['can_resurrect'] = false;
+        }
+
         foreach ($item as $key => $value) {
             if (!is_null($value) || ($key === 'item_suffix_id' || $key === 'item_prefix_id')) {
 
@@ -57,13 +89,17 @@ class ItemsSheet implements ToCollection {
                         $value = $foundSuffix->id;
                     }
 
-                }else if ($key === 'item_prefix_id') {
+                } else if ($key === 'item_prefix_id') {
                     $foundPrefix = ItemAffix::where('name', $value)->first();
 
                     if (is_null($foundPrefix)) {
                         $value = null;
                     } else {
                         $value = $foundPrefix->id;
+                    }
+                } else if ($key === 'can_drop') {
+                    if (is_null($value)) {
+                        $value = false;
                     }
                 }
 

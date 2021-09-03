@@ -75,7 +75,7 @@ class SkillModifiersTest extends TestCase
         ]);
 
         (new CharacterFactory)->createBaseCharacter();
-                                        
+
         Livewire::test(SkillModifiers::class, [
             'skill' => $skill,
         ])->call('update', $skill->id)->assertSee('Base Damage Modifier Per level:');
@@ -87,19 +87,13 @@ class SkillModifiersTest extends TestCase
         Livewire::test(SkillModifiers::class)->call('update', null)->assertNotSet('skill.name', $skill->name);
     }
 
-    public function testFailValidationWhenClassIsNotSelected() {
-        Livewire::test(SkillModifiers::class, [
-            'skill' => $this->createGameSkill(),
-        ])->set('for', 'select-class')->call('validateInput', 'nextStep', 2)->assertSee('Class must be selected.');
-    }
-
     public function testFailToSaveModifierWhenMofiersAreEmpty() {
         $monster = $this->createMonster();
 
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-                                        
+
         $skill = $this->createGameSkill([
             'base_damage_mod_bonus_per_level' => null,
             'base_healing_mod_bonus_per_level' => null,
@@ -114,7 +108,7 @@ class SkillModifiersTest extends TestCase
         ])->set('for', 'all')
           ->call('validateInput', 'nextStep', 2)
           ->assertSee('You must supply some kind of bonus per level.');
-          
+
 
         // Assert skill was not applied:
         $this->assertNull($character->refresh()->skills()->where('game_skill_id', $skill->id)->first());
@@ -124,7 +118,7 @@ class SkillModifiersTest extends TestCase
     public function testFailToSaveModifierWhenMofiersAreBelowZero() {
         $monster = $this->createMonster();
 
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
@@ -142,7 +136,7 @@ class SkillModifiersTest extends TestCase
         ])->set('for', 'all')
           ->call('validateInput', 'nextStep', 2)
           ->assertSee('No bonus may be below  or equal to: 0.');
-          
+
 
         // Assert skill was not applied:
         $this->assertNull($character->refresh()->skills()->where('game_skill_id', $skill->id)->first());
@@ -152,7 +146,7 @@ class SkillModifiersTest extends TestCase
     public function testFailToSaveModifierWhenNoMonsterSelected() {
         $monster = $this->createMonster();
 
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
@@ -163,7 +157,7 @@ class SkillModifiersTest extends TestCase
         ])->set('for', 'select-monsters')
           ->call('validateInput', 'nextStep', 2)
           ->assertSee('At least one or more monsters must be selected.');
-          
+
 
         // Assert skill was not applied:
         $this->assertNull($character->refresh()->skills()->where('game_skill_id', $skill->id)->first());
@@ -174,7 +168,7 @@ class SkillModifiersTest extends TestCase
     public function testAssignToAll() {
         $monster = $this->createMonster();
 
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $skill = $this->createGameSkill();
@@ -183,7 +177,7 @@ class SkillModifiersTest extends TestCase
             'skill' => $skill,
         ])->set('for', 'all')
           ->call('validateInput', 'nextStep', 2);
-          
+
 
         // Assert skill was applied:
         $this->assertNotNull($character->refresh()->skills()->where('game_skill_id', $skill->id)->first());
@@ -193,7 +187,7 @@ class SkillModifiersTest extends TestCase
     public function testDontAssignToAllWhenBothHaveTheSkill() {
         $monster = $this->createMonster();
 
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $skill = $this->createGameSkill();
 
@@ -210,7 +204,7 @@ class SkillModifiersTest extends TestCase
             'skill' => $skill,
         ])->set('for', 'all')
           ->call('validateInput', 'nextStep', 2);
-          
+
 
         // Assert skill was applied:
         $this->assertEquals(1, $character->refresh()->skills()->where('game_skill_id', $skill->id)->count());
@@ -219,43 +213,24 @@ class SkillModifiersTest extends TestCase
 
     public function testAssignToClasses() {
 
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $skill = $this->createGameSkill();
 
         Livewire::test(SkillModifiers::class, [
             'skill' => $skill,
-        ])->set('for', 'select-class')
-          ->set('selectedClass', $character->game_class_id)
+        ])->set('for', 'select-class')->set('skill.game_class_id', $character->class->id)
           ->call('validateInput', 'nextStep', 2);
 
         $this->assertNotNull($character->skills->where('game_skill_id', $skill->id)->first());
     }
 
-    public function testDontAssignToClassesWhenClassesHaveSkill() {
-        
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
-
-        $skill = $this->createGameSkill();
-
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        
-
-        Livewire::test(SkillModifiers::class, [
-            'skill' => $skill,
-        ])->set('for', 'select-class')
-          ->set('selectedClass', $character->game_class_id)
-          ->call('validateInput', 'nextStep', 2);
-
-        $this->assertEquals(1, $character->skills->where('game_skill_id', $skill->id)->count());
-    }
-
     public function testAssignToAllWhenUserIsLoggedIn() {
-        
+
         $monster = $this->createMonster();
 
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $skill = $this->createGameSkill();
@@ -273,7 +248,7 @@ class SkillModifiersTest extends TestCase
             'skill' => $skill,
         ])->set('for', 'all')
           ->call('validateInput', 'nextStep', 2);
-          
+
 
         // Assert skill was applied:
         $this->assertNotNull($character->refresh()->skills()->where('game_skill_id', $skill->id)->first());
@@ -281,10 +256,10 @@ class SkillModifiersTest extends TestCase
     }
 
     public function testAssignToMonster() {
-        
+
         $monster = $this->createMonster();
 
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
@@ -295,7 +270,7 @@ class SkillModifiersTest extends TestCase
         ])->set('for', 'select-monsters')
           ->set('selectedMonsters', [$monster->id])
           ->call('validateInput', 'nextStep', 2);
-          
+
 
         // Assert skill was applied:
         $this->assertNull($character->refresh()->skills()->where('game_skill_id', $skill->id)->first());
@@ -305,7 +280,7 @@ class SkillModifiersTest extends TestCase
     public function testDontAssignToMonsterWhenMonsterHasSkill() {
         $monster = $this->createMonster();
 
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $skill = $this->createGameSkill();
 
@@ -321,13 +296,13 @@ class SkillModifiersTest extends TestCase
         ])->set('for', 'select-monsters')
           ->set('selectedMonsters', [$monster->id])
           ->call('validateInput', 'nextStep', 2);
-          
+
 
         $this->assertEquals(1, $monster->refresh()->skills()->where('game_skill_id', $skill->id)->count());
     }
 
     public function testFailToAssignToUnknownMonster() {
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $skill = $this->createGameSkill();
 
@@ -342,7 +317,7 @@ class SkillModifiersTest extends TestCase
 
     public function testInitialSkillIsArray() {
         $skill = $this->createGameSkill();
-        
+
         Livewire::test(SkillModifiers::class, ['skill' => $skill->toArray()])->assertSet('skill.name', $skill->name);
     }
 }

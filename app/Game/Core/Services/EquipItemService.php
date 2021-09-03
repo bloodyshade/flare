@@ -29,6 +29,11 @@ class EquipItemService {
     private $characterTransformer;
 
     /**
+     * @var InventorySetService $inventorySetService
+     */
+    private $inventorySetService;
+
+    /**
      * @var Request $request
      */
     private $request;
@@ -43,10 +48,12 @@ class EquipItemService {
      *
      * @param Manager $manager
      * @param CharacterAttackTransformer $characterTransformer
+     * @param InventorySetService $inventorySetService
      */
-    public function __construct(Manager $manager, CharacterAttackTransformer $characterTransformer) {
+    public function __construct(Manager $manager, CharacterAttackTransformer $characterTransformer, InventorySetService $inventorySetService) {
         $this->manager              = $manager;
         $this->characterTransformer = $characterTransformer;
+        $this->inventorySetService  = $inventorySetService;
     }
 
     /**
@@ -88,12 +95,31 @@ class EquipItemService {
             throw new EquipItemException('Could not equip item because you either do not have it, or it is equipped already.');
         }
 
-        $itemForPosition = $this->character->inventory->slots->filter(function($slot) {
-            return $slot->position === $this->request->position && $slot->equipped;
-        })->first();
+        $equippedSet = $this->character->inventorySets()->where('is_equipped', true)->first();
 
-        if (!is_null($itemForPosition)) {
-            $itemForPosition->update(['equipped' => false]);
+        if (!is_null($equippedSet)) {
+            $this->inventorySetService->unEquipInventorySet($equippedSet);
+        }
+
+        if ($characterSlot->item->type === 'bow') {
+            $this->unequipBothHands();
+        } else {
+            $hasBowEquipped = $this->character->inventory->slots->filter(function($slot) {
+                return $slot->item->type === 'bow' && $slot->equipped;
+            })->isNotEmpty();
+
+
+            if ($hasBowEquipped && ($characterSlot->item->type === 'weapon' || $characterSlot->item->type === 'shield')) {
+                $this->unequipBothHands();
+            } else {
+                $itemForPosition = $this->character->inventory->slots->filter(function($slot) {
+                    return $slot->position === $this->request->position && $slot->equipped;
+                })->first();
+
+                if (!is_null($itemForPosition)) {
+                    $itemForPosition->update(['equipped' => false]);
+                }
+            }
         }
 
         $characterSlot->update([
@@ -118,7 +144,40 @@ class EquipItemService {
      * @param Collection $inventorySlots
      * @return array
      */
-    public function getItemStats(Item $toCompare, Collection $inventorySlots): array {
-       return resolve(ItemComparison::class)->fetchDetails($toCompare, $inventorySlots);
+    public function getItemStats(Item $toCompare, Collection $inventorySlots, Character $character): array {
+       return resolve(ItemComparison::class)->fetchDetails($toCompare, $inventorySlots, $character);
+    }
+
+    /**
+     * Do we have a bow equipped?
+     *
+     * @param Item $itemToEquip
+     * @param Collection $inventorySlots
+     * @return bool
+     */
+    public function isBowEquipped(Item $itemToEquip, Collection $inventorySlots): bool {
+        $validTypes = ['weapon', 'shield', 'bow'];
+
+        if (!in_array($itemToEquip->type, $validTypes)) {
+             return false;
+        }
+
+        return $inventorySlots->filter(function($slot) {
+            return $slot->item->type === 'bow' && $slot->equipped;
+        })->isNotEmpty();
+    }
+
+    public function unequipBothHands() {
+        $slots = $this->character->inventory->slots->filter(function($slot) {
+            return $slot->equipped;
+        });
+
+        foreach ($slots as $slot) {
+            if ($slot->position === 'right-hand' || $slot->position === 'left-hand') {
+                $slot->update(['equipped' => false]);
+            }
+        }
+
+        $this->character = $this->character->refresh();
     }
 }

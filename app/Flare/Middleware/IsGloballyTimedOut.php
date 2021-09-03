@@ -2,7 +2,6 @@
 
 namespace App\Flare\Middleware;
 
-use App\Flare\Events\OpenTimeOutModal;
 use Closure;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +18,10 @@ class IsGloballyTimedOut
     public function handle($request, Closure $next, $guard = null)
     {
         if (!is_null(auth()->user()->timeout_until)) {
+            if ($request->wantsJson()) {
+                return response()->json([], 422);
+            }
+
             if (Route::current()->getName() !== 'game') {
                 return redirect()->route('game')->with('error', 'You are timed out. You cannot do that.');
             }

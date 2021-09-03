@@ -1,0 +1,40 @@
+<table>
+    <thead>
+    <tr>
+        <th>name</th>
+        <th>type</th>
+        <th>description</th>
+        <th>max_level</th>
+        <th>base_damage_mod_bonus_per_level</th>
+        <th>base_healing_mod_bonus_per_level</th>
+        <th>base_ac_mod_bonus_per_level</th>
+        <th>fight_time_out_mod_bonus_per_level</th>
+        <th>move_time_out_mod_bonus_per_level</th>
+        <th>can_monsters_have_skill</th>
+        <th>can_train</th>
+        <th>skill_bonus_per_level</th>
+        <th>game_class_id</th>
+        <th>is_locked</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach($skills as $skill)
+        <tr>
+            <td>{{$skill->name}}</td>
+            <td>{{$skill->type}}</td>
+            <td>{!! nl2br(e($skill->description)) !!}</td>
+            <td>{{$skill->max_level}}</td>
+            <td>{{$skill->base_damage_mod_bonus_per_level}}</td>
+            <td>{{$skill->base_healing_mod_bonus_per_level}}</td>
+            <td>{{$skill->base_ac_mod_bonus_per_level}}</td>
+            <td>{{$skill->fight_time_out_mod_bonus_per_level}}</td>
+            <td>{{$skill->move_time_out_mod_bonus_per_level}}</td>
+            <td>{{$skill->can_monsters_have_skill}}</td>
+            <td>{{$skill->can_train}}</td>
+            <td>{{$skill->skill_bonus_per_level}}</td>
+            <td>{{!is_null($skill->gameClass) ? $skill->gameClass->name : null}}</td>
+            <td>{{$skill->is_locked}}</td>
+        </tr>
+    @endforeach
+    </tbody>
+</table>

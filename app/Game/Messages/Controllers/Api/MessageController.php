@@ -2,9 +2,7 @@
 
 namespace App\Game\Messages\Controllers\Api;
 
-use App\Admin\Events\UpdateAdminChatEvent;
-use App\Flare\Handlers\MessageThrottledHandler;
-use App\Game\Messages\Values\MapChatColor;
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Game\Messages\Events\MessageSentEvent;
@@ -14,14 +12,21 @@ use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Flare\Models\Character;
 use App\Game\Messages\Models\Message;
 use App\Flare\Models\User;
-use Carbon\Carbon;
+use App\Admin\Events\UpdateAdminChatEvent;
+use App\Flare\Handlers\MessageThrottledHandler;
+use App\Flare\Models\Npc;
+use App\Game\Messages\Values\MapChatColor;
+use App\Game\Messages\Handlers\NpcCommandHandler;
 
 class MessageController extends Controller {
 
     private $serverMessage;
 
-    public function __construct(ServerMessageBuilder $serverMessage) {
-        $this->serverMessage = $serverMessage;
+    private $npcCommandHandler;
+
+    public function __construct(ServerMessageBuilder $serverMessage, NpcCommandHandler $npcCommandHandler) {
+        $this->serverMessage     = $serverMessage;
+        $this->npcCommandHandler = $npcCommandHandler;
     }
 
     public function fetchUserInfo(Request $request, User $user) {
@@ -46,6 +51,24 @@ class MessageController extends Controller {
                                 $message->y    = $message->y_position;
                                 $message->name = $message->user->hasRole('Admin') ? 'Admin' : $message->user->character->name;
 
+                                $mapName = '';
+
+                                switch ($message->color) {
+                                    case '#ffffff':
+                                        $mapName = 'SUR';
+                                        break;
+                                    case '#ffad47':
+                                        $mapName = 'LABY';
+                                        break;
+                                    case '#755c59':
+                                        $mapName = 'DUN';
+                                        break;
+                                    default:
+                                        $mapName = 'SUR';
+                                }
+
+                                $message->map = $mapName;
+
                                 return $message;
                             })
                             ->all();
@@ -66,6 +89,22 @@ class MessageController extends Controller {
 
             $x     = $character->map->character_position_x;
             $y     = $character->map->character_position_y;
+            $mapName = '';
+
+            switch ($character->map->gameMap->name) {
+                case 'Surface':
+                    $mapName = 'SUR';
+                    break;
+                case 'Labyrinth':
+                    $mapName = 'LABY';
+                    break;
+                case 'Dungeons':
+                    $mapName = 'DUN';
+                    break;
+                default:
+                    $mapName = 'SUR';
+            }
+
             $color = (new MapChatColor($character->map->gameMap->name))->getColor();
         }
 
@@ -75,6 +114,8 @@ class MessageController extends Controller {
             'x_position' => $x,
             'y_position' => $y,
         ]);
+
+        $message->map_name = $mapName;
 
         broadcast(new MessageSentEvent(auth()->user(), $message))->toOthers();
 
@@ -113,6 +154,22 @@ class MessageController extends Controller {
             $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
 
             broadcast(new UpdateAdminChatEvent($adminUser));
+
+            return response()->json([], 200);
+        }
+
+        $npc = Npc::where('name', $request->user_name)->first();
+
+        if (!is_null($npc)) {
+            $command = $npc->commands->where('command', $request->message)->first();
+
+            if (!is_null($command)) {
+                $this->npcCommandHandler->handleForType($command->command_type, $npc, auth()->user());
+
+                return response()->json([], 200);
+            }
+
+            broadcast(new ServerMessageEvent($user, $this->serverMessage->build('no_matching_command')));
 
             return response()->json([], 200);
         }

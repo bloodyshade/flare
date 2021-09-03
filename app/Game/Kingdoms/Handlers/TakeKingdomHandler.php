@@ -7,6 +7,8 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomUnit;
 use App\Flare\Models\UnitMovementQueue;
 use App\Game\Core\Traits\KingdomCache;
+use App\Game\Kingdoms\Events\AddKingdomToMap;
+use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Service\UnitRecallService;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Services\MovementService;
@@ -57,13 +59,16 @@ class TakeKingdomHandler {
 
         $this->setOldKingdom($defender);
 
-        $this->removeKingdomFromCache($defendingCharacter, $defender);
+        if (!is_null($defendingCharacter)) {
+            $this->removeKingdomFromCache($defendingCharacter, $defender);
 
-        event(new UpdateMapDetailsBroadcast($defendingCharacter->map, $defendingCharacter->user, $this->movementService, true));
+            event(new UpdateMapDetailsBroadcast($defendingCharacter->map, $defendingCharacter->user, $this->movementService, true));
+        }
 
         $defender->update([
-            'character_id' => $attacker->id,
-            'current_morale' => .10
+            'character_id'   => $attacker->id,
+            'current_morale' => .10,
+            'npc_owned'      => false,
         ]);
 
         $kingdom = $this->updateKingdomsUnits($defender->refresh(), $survivingUnits);
@@ -71,6 +76,10 @@ class TakeKingdomHandler {
         $this->addKingdomToCache($attacker, $kingdom);
 
         $this->stopOtherAttacks($attacker);
+
+        event(new AddKingdomToMap($attacker));
+
+        broadcast(new UpdateGlobalMap($attacker));
 
         event(new UpdateMapDetailsBroadcast($attacker->map, $attacker->user, $this->movementService, true));
 
@@ -92,12 +101,20 @@ class TakeKingdomHandler {
      * @param Kingdom $kingdom
      */
     protected function setOldKingdom(Kingdom $kingdom) {
-        $this->oldKingdom = Kingdom::where('id', $kingdom->id)
-                                   ->where('character_id', $kingdom->character->id)
-                                   ->first()
-                                   ->load('units', 'buildings')
-                                   ->toArray();
+        $oldKingdom = Kingdom::where('id', $kingdom->id);
 
+        if (!is_null($kingdom->character)) {
+            $oldKingdom = $oldKingdom->where('character_id', $kingdom->character->id)
+                                      ->first()
+                                      ->load('units', 'buildings')
+                                      ->toArray();
+        } else {
+            $oldKingdom = $oldKingdom->first()
+                                     ->load('units', 'buildings')
+                                     ->toArray();
+        }
+
+        $this->oldKingdom = $oldKingdom;
     }
 
 

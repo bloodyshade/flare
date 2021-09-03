@@ -90,7 +90,7 @@
                             </td>
                         </tr>
                     @empty
-                        <x-data-tables.no-results colspan="4" />
+                        <x-data-tables.no-results colspan="7" />
                     @endforelse
                 </x-data-tables.body>
             </x-data-tables.table>

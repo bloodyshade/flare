@@ -4,8 +4,10 @@ namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Mail\GenericMail;
 use App\Game\Kingdoms\Builders\AttackBuilder;
+use App\Game\Kingdoms\Events\UpdateEnemyKingdomsMorale;
 use App\Game\Kingdoms\Events\UpdateUnitMovementLogs;
 use App\Game\Kingdoms\Handlers\NotifyHandler;
+use Exception;
 use Facades\App\Flare\Values\UserOnlineValue;
 use App\Flare\Events\KingdomServerMessageEvent;
 use App\Flare\Models\Character;
@@ -112,6 +114,7 @@ class AttackService {
      * @param UnitMovementQueue $unitMovement
      * @param Character $character
      * @param int $defenderId
+     * @throws Exception
      */
     public function attack(UnitMovementQueue $unitMovement, Character $character, int $defenderId) {
         $attackingUnits = $unitMovement->units_moving;
@@ -141,11 +144,10 @@ class AttackService {
             return $this->handleSettlerUnit($defender, $unitMovement, $character);
         }
 
-        $this->notifyHandler = $this->notifyHandler->setNewDefendingKingdom($defender);
-
-        $this->notifyHandler->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender);
+        $this->notifyHandler->setSentUnits($this->unitsSent)->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender);
 
         if (!$this->anySurvivingUnits()) {
+
             $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::LOST, $defender, $character);
 
             $unitMovement->delete();
@@ -280,31 +282,12 @@ class AttackService {
      * @param Character $character
      */
     protected function attemptToSettleKingdom(Kingdom $defender, UnitMovementQueue $unitMovement, Character $character) {
-        if ($defender->current_morale > 0) {
-            $defender = $this->kingdomHandler->updateDefendersMorale($defender, $this->settler);
+        $defender = $this->kingdomHandler->updateDefendersMorale($defender, $this->settler);
 
-            $this->notifyHandler = $this->notifyHandler->setNewDefendingKingdom($defender);
+        $this->notifyHandler = $this->notifyHandler->setNewDefendingKingdom($defender);
 
-            if ($defender->current_morale === 0 || $defender->current_morale === 0.0) {
+        if ($defender->current_morale === 0 || $defender->current_morale === 0.0) {
 
-                $this->kingdomHandler->takeKingdom($defender, $character, $this->survivingUnits);
-
-                $this->notifyHandler = $this->notifyHandler->setOldDefendingKingdom($this->kingdomHandler->getOldKingdom());
-
-                $this->notifyHandler->notifyDefender(KingdomLogStatusValue::LOST_KINGDOM, $defender);
-
-                $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::TAKEN, $defender, $character);
-
-                $this->notifyHandler->kingdomHasFallenMessage($character);
-            } else {
-
-                $this->notifyHandler->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender);
-
-                $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::ATTACKED, $defender, $character);
-
-                $this->returnUnits($defender, $unitMovement, $character);
-            }
-        } else {
             $this->kingdomHandler->takeKingdom($defender, $character, $this->survivingUnits);
 
             $this->notifyHandler = $this->notifyHandler->setOldDefendingKingdom($this->kingdomHandler->getOldKingdom());
@@ -314,6 +297,21 @@ class AttackService {
             $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::TAKEN, $defender, $character);
 
             $this->notifyHandler->kingdomHasFallenMessage($character);
+        } else {
+
+            $defender->current_morale -= .10;
+
+            $defender->save();
+
+            $defender = $defender->refresh();
+
+            broadcast(new UpdateEnemyKingdomsMorale($defender));
+
+            $this->notifyHandler->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender);
+
+            $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::ATTACKED, $defender, $character);
+
+            $this->returnUnits($defender, $unitMovement, $character);
         }
     }
 

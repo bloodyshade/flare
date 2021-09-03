@@ -1,6 +1,6 @@
 <?php
 
-Route::get('/items/{item}', ['as' => 'items.item', 'uses' => 'ItemsController@show']);
+Route::get('/items/{item}', ['as' => 'game.items.item', 'uses' => 'ItemsController@show']);
 Route::get('/monsters/{monster}', ['as' => 'game.monsters.monster', 'uses' => 'MonstersController@show']);
 Route::get('/locations/{location}', ['as' => 'game.locations.location', 'uses' => 'LocationsController@show']);
 
@@ -22,9 +22,14 @@ Route::middleware(['is.player.banned', 'is.character.who.they.say.they.are', 'is
     Route::get('/game/character/inventory/compare/{character}', ['as' => 'game.inventory.compare', 'uses' => 'CharacterInventoryController@compare']);
     Route::get('/game/character/inventory/compare-items/{user}', ['as' => 'game.inventory.compare-items', 'uses' => 'CharacterInventoryController@compareItem']);
     Route::post('/game/equip/item/{character}', ['as' => 'game.equip.item', 'uses' => 'CharacterInventoryController@equipItem']);
+    Route::post('/game/equip/set/{character}/{inventorySet}', ['as' => 'game.equip.set', 'uses' => 'CharacterInventoryController@equipSet']);
     Route::post('/game/unequip/all/{character}', ['as' => 'game.unequip.all', 'uses' => 'CharacterInventoryController@unequipAll']);
     Route::post('/game/unequip/item/{character}', ['as' => 'game.inventory.unequip', 'uses' => 'CharacterInventoryController@unequipItem']);
     Route::post('/game/destroy/item/{character}', ['as' => 'game.destroy.item', 'uses' => 'CharacterInventoryController@destroy']);
+    Route::post('/game/character/{character}/inventory/move-to-set', ['as' => 'game.inventory.move.to.set', 'uses' => 'CharacterInventoryController@moveToSet']);
+    Route::post('/game/character/{character}/inventory/remove-from-set', ['as' => 'game.remove.from.set', 'uses' => 'CharacterInventoryController@removeFromSet']);
+    Route::post('/game/character/{character}/inventory/equipped/save-as-set', ['as' => 'game.inventory.save.as.set', 'uses' => 'CharacterInventoryController@saveEquippedAsSet']);
+    Route::post('/game/character/{character}/inventory/clear-set/{inventorySet}', ['as' => 'game.inventory.empty.set', 'uses' => 'CharacterInventoryController@emptySet']);
 
     Route::get('/skill/{skill}', ['as' => 'skill.character.info', 'uses' => 'CharacterSkillController@show']);
     Route::post('/skill/train/{character}', ['as' => 'train.skill', 'uses' => 'CharacterSkillController@train']);
@@ -38,17 +43,13 @@ Route::middleware(['is.player.banned', 'is.character.who.they.say.they.are', 'is
     Route::post('/current-adventures/delete/{adventureLog}', ['as' => 'game.adventures.delete', 'uses' => 'CharacterAdventureController@delete']);
     Route::post('/current-adventure/{adventureLog}/distribute-rewards', ['as' => 'game.current.adventure.reward', 'uses' => 'CharacterAdventureController@collectReward']);
 
-    Route::get('/market/', ['as' => 'game.market', 'uses' => 'MarketController@index']);
-    Route::get('/market/sell', ['as' => 'game.market.sell', 'uses' => 'MarketController@sell']);
-    Route::post('/market/list/{slot}', ['as' => 'game.market.list', 'uses' => 'MarketController@list']);
-
-    Route::get('/market/current-listings/{character}', ['as' => 'game.current-listings', 'uses' => 'MarketController@currentListings']);
-    Route::get('/market/current-listings/edit/{marketBoard}', ['as' => 'game.edit.current-listings', 'uses' => 'MarketController@editCurrentListings']);
-    Route::post('/market/current-listing/{marketBoard}/update', ['as' => 'game.update.current-listing', 'uses' => 'MarketController@updateCurrentListing']);
-    Route::post('/market/current-listing/{marketBoard}/delist', ['as' => 'game.delist.current-listing', 'uses' => 'MarketController@delist']);
 
     Route::get('/settings/{user}', ['as' => 'user.settings', 'uses' => 'SettingsController@index']);
+    Route::post('/settings/{user}/chat-settings', ['as' => 'user.settings.chat', 'uses' => 'SettingsController@chatSettings']);
     Route::post('/settings/{user}/email-settings', ['as' => 'user.settings.email', 'uses' => 'SettingsController@emailSettings']);
     Route::post('/settings/{user}/character-name', ['as' => 'user.settings.character', 'uses' => 'SettingsController@characterSettings']);
-    Route::post('/settings/{user}/security', ['as' => 'user.settings.security', 'uses' => 'SettingsController@securityQuestions']);
+
+
+    Route::post('/items/use-multiple/{character}', ['as' => 'game.item.use-multiple', 'uses' => 'ItemsController@useMultiple']);
+    Route::post('/items/use/{character}/{item}', ['as' => 'game.item.use', 'uses' => 'ItemsController@useItem']);
 });

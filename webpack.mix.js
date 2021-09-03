@@ -41,4 +41,5 @@ mix.webpackConfig({
       postcssCustomProperties(),
       autoprefixer(),
     ])
-    .version();
+    .version()
+    .sourceMaps();

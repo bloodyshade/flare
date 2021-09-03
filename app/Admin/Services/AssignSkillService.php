@@ -25,7 +25,7 @@ class AssignSkillService {
      * @throws Exception
      * @return void
      */
-    public function assignSkill(string $for, GameSkill $skill, int $monsterId = null, int $classId = null) {
+    public function assignSkill(string $for, GameSkill $skill, int $monsterId = null) {
         switch($for) {
             case 'all':
                 $this->assignSkillToCharacters($skill);
@@ -35,7 +35,7 @@ class AssignSkillService {
                 $this->assignSkillToMonster($skill, $monsterId);
                 return;
             case 'select-class':
-                $this->assignSkillToClasses($skill, $classId);
+                $this->assignSkillToClasses($skill);
                 return;
             case 'only-characters':
                 $this->assignSkillToCharacters($skill);
@@ -55,8 +55,8 @@ class AssignSkillService {
         }
     }
 
-    protected function assignSkillToClasses(GameSkill $skill, int $classId) {
-        Character::where('game_class_id', $classId)->chunkById(1000, function($characters) use($skill) {
+    protected function assignSkillToClasses(GameSkill $skill) {
+        Character::where('game_class_id', $skill->game_class_id)->chunkById(1000, function($characters) use($skill) {
             foreach ($characters as $character) {
 
                 $character->skills()->create([
@@ -82,6 +82,7 @@ class AssignSkillService {
                     'currently_training' => false,
                     'level' => 1,
                     'xp_max' => $skill->can_train ? rand(100, 150) : rand(100, 200),
+                    'is_locked' => $skill->is_locked,
                 ]);
 
                 $this->alertUser($character, $skill);
@@ -127,10 +128,6 @@ class AssignSkillService {
             'game_skill_id' => $skill->id,
             'currently_training' => false,
             'level' => 0,
-        ]);
-
-        $skill->update([
-            'specifically_assigned' => true,
         ]);
     }
 }

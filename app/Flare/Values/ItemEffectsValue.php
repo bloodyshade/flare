@@ -9,15 +9,19 @@ class ItemEffectsValue {
      */
     private $value;
 
-    const WALKONWATER      = 'walk-on-water';
-    const LABYRINTH        = 'labyrinth';
+    const WALK_ON_WATER       = 'walk-on-water';
+    const WALK_ON_DEATH_WATER = 'walk-on-death-water';
+    const LABYRINTH           = 'labyrinth';
+    const DUNGEON             = 'dungeon';
 
     /**
      * @var string[] $values
      */
     protected static $values = [
-        self::WALKONWATER => 'walk-on-water',
-        self::LABYRINTH   => 'labyrinth',
+        self::WALK_ON_WATER       => 'walk-on-water',
+        self::WALK_ON_DEATH_WATER => 'walk-on-death-water',
+        self::LABYRINTH           => 'labyrinth',
+        self::DUNGEON             => 'dungeon',
     ];
 
     /**
@@ -29,6 +33,7 @@ class ItemEffectsValue {
      * @throws \Exception
      */
     public function __construct(string $value) {
+
         if (!in_array($value, self::$values)) {
             throw new \Exception($value . ' does not exist.');
         }
@@ -42,7 +47,16 @@ class ItemEffectsValue {
      * @return bool
      */
     public function walkOnWater(): bool {
-        return $this->value === self::WALKONWATER;
+        return $this->value === self::WALK_ON_WATER;
+    }
+
+    /**
+     * Is Walk on death water?
+     *
+     * @return bool
+     */
+    public function walkOnDeathWater(): bool {
+        return $this->value === self::WALK_ON_DEATH_WATER;
     }
 
     /**
@@ -52,5 +66,14 @@ class ItemEffectsValue {
      */
     public function labyrinth(): bool {
         return $this->value === self::LABYRINTH;
+    }
+
+    /**
+     * Can access Dungeon
+     *
+     * @return bool
+     */
+    public function dungeon(): bool {
+        return $this->value === self::DUNGEON;
     }
 }

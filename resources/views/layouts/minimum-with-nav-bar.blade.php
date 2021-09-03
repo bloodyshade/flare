@@ -106,7 +106,7 @@
                     </div>
                 </div>
 
-                <footer class="footer"> © 2020 Flare </footer>
+                <footer class="footer"></footer>
             @endif
         </div>
     </div>

@@ -12,10 +12,12 @@ class InventoryManagement {
 
     private $characterFactory;
 
+    private $slotIds = [];
     /**
      * Constructor
      *
      * @param Character $character
+     * @param CharacterFactory|null $characterFactory
      */
     public function __construct(Character $character, CharacterFactory $characterFactory = null) {
         $this->character        = $character;
@@ -25,11 +27,12 @@ class InventoryManagement {
     /**
      * Equip the left hand with an item that isn't already equipped.
      *
-     * @param int $slotId | 1
+     * @param string $itemName
      * @return InventoryManagement
+     * @throws \Exception
      */
-    public function equipLeftHand(int $slotId = 1): InventoryManagement {
-        $slot = $this->fetchSlot($slotId);
+    public function equipLeftHand(string $itemName): InventoryManagement {
+        $slot = $this->fetchSlot($itemName);
 
         $slot->update([
             'equipped' => true,
@@ -44,11 +47,12 @@ class InventoryManagement {
     /**
      * Equip the right hand.
      *
-     * @param int $slotId | 1
+     * @param string $itemName
      * @return InventoryManagement
+     * @throws \Exception
      */
-    public function equipRightHand(int $slotId = 1): InventoryManagement {
-        $slot = $this->fetchSlot($slotId);
+    public function equipRightHand(string $itemName): InventoryManagement {
+        $slot = $this->fetchSlot($itemName);
 
         $slot->update([
             'equipped' => true,
@@ -65,12 +69,13 @@ class InventoryManagement {
      *
      * Accepted: spell-one, spell-two
      *
-     * @param int $slotId | 1
+     * @param string $itemName
      * @param string $position | spell-one, spell-two
      * @return InventoryManagement
+     * @throws \Exception
      */
-    public function equipSpellSlot(string $position = 'spell-one', int $slotId = 1): InventoryManagement {
-        $slot = $this->fetchSlot($slotId);
+    public function equipSpellSlot(string $itemName, string $position = 'spell-one'): InventoryManagement {
+        $slot = $this->fetchSlot($itemName);
 
         $slot->update([
             'equipped' => true,
@@ -85,12 +90,13 @@ class InventoryManagement {
     /**
      * Equip an artifact.
      *
-     * @param int $slotId
+     * @param string $itemName
      * @param string $position | artifact-one, artifact-two
      * @return InventoryManagement
+     * @throws \Exception
      */
-    public function equipArtifact(string $position = 'artifact-one', int $slotId = 1): InventoryManagement {
-        $slot = $this->fetchSlot($slotId);
+    public function equipArtifact(string $itemName, string $position = 'artifact-one'): InventoryManagement {
+        $slot = $this->fetchSlot($itemName);
 
         $slot->update([
             'equipped' => true,
@@ -105,12 +111,13 @@ class InventoryManagement {
     /**
      * Equip an item.
      *
-     * @param int $slotId | 1
      * @param string $position
+     * @param string $itemName
      * @return InventoryManagement
+     * @throws \Exception
      */
-    public function equipItem(string $position, int $slotId = 1): InventoryManagement {
-        $slot = $this->fetchSlot($slotId);
+    public function equipItem(string $position, string $itemName): InventoryManagement {
+        $slot = $this->fetchSlot($itemName);
 
         $slot->update([
             'equipped' => true,
@@ -128,17 +135,60 @@ class InventoryManagement {
      * Ignores the inventory max limit.
      *
      * @param Item $item
+     * @param bool $equip
+     * @param string|null $position
      * @return InventoryManagement
      */
-    public function giveItem(Item $item): InventoryManagement {
-        $this->character->inventory->slots()->create([
+    public function giveItem(Item $item, bool $equip = false, string $position = null): InventoryManagement {
+        $this->slotIds[] = $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
             'item_id'      => $item->id,
-        ]);
+            'equipped'     => $equip,
+            'position'     => $position,
+        ])->id;
 
         $this->character = $this->character->refresh();
 
         return $this;
+    }
+
+    /**
+     * Give the same item multiple times.
+     *
+     * @param Item $item
+     * @param int $amount
+     * @return $this
+     */
+    public function giveItemMultipleTimes(Item $item, int $amount = 1, bool $equip = false, string $position = null): InventoryManagement {
+        for ($i = 1; $i <= $amount; $i++) {
+            $this->slotIds[] = $this->character->inventory->slots()->create([
+                'inventory_id' => $this->character->inventory->id,
+                'item_id'      => $item->id,
+                'equipped'     => $equip,
+                'position'     => $position,
+            ])->id;
+        }
+
+        $this->character = $this->character->refresh();
+
+        return $this;
+    }
+
+    /**
+     * Get the slot id of an item given to th character.
+     *
+     * You must first use the giveItem command, before calling this.
+     * The index param is the index of the array starting at 0.
+     *
+     * @param int $index
+     * @return int|null
+     */
+    public function getSlotId(int $index) {
+        if (isset($this->slotIds[$index])) {
+            return $this->slotIds[$index];
+        }
+
+        return null;
     }
 
     /**
@@ -177,21 +227,15 @@ class InventoryManagement {
         return $this->character->refresh();
     }
 
-    protected function fetchSlot(int $slotId): InventorySlot {
-        $foundMatching = $this->character->inventory->slots->filter(function($slot) use($slotId) {
-            return $slot->id === $slotId && !$slot->equipped;
+    protected function fetchSlot(string $itemName): InventorySlot {
+        $foundMatching = $this->character->inventory->slots->filter(function($slot) use($itemName) {
+            return $slot->item->name === $itemName;
          })->first();
 
          if (is_null($foundMatching)) {
              throw new \Exception('Item is not in inventory or is already equipped');
          }
 
-         $slot = $this->character->inventory->slots->find($slotId);
-
-         if (is_null($slot)) {
-             throw new \Exception('Slot is not found, did you give the item to the player?');
-         }
-
-         return $slot;
+         return $foundMatching;
     }
 }

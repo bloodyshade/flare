@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-
     <x-common.small-container>
         <x-common.cards.card-with-title title="Login">
             <form method="POST" action="{{ route('login') }}">

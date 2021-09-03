@@ -2,10 +2,11 @@
 
 namespace Tests\Unit\Admin\Imports;
 
+use App\Admin\Import\Kingdoms\KingdomsImport;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Maatwebsite\Excel\Facades\Excel;
 use Tests\TestCase;
-use App\Admin\Import\Kingdoms\KingdomsImport;
+use App\Admin\Import\Kingdoms\NpcsImport;
 
 class KingdomsImportTest extends TestCase {
     use RefreshDatabase;

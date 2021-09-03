@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Traits;
 
+use App\Flare\Models\User;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use App\Flare\Models\MarketBoard;
@@ -10,11 +11,20 @@ use App\Game\Core\Events\UpdateMarketBoardBroadcastEvent;
 
 trait UpdateMarketBoard {
 
-    public function sendUpdate(MarketItemsTransfromer $transformer, Manager $manager) {
+    /**
+     * @param MarketItemsTransfromer $transformer
+     * @param Manager $manager
+     * @param User|null $user
+     */
+    public function sendUpdate(MarketItemsTransfromer $transformer, Manager $manager, User $user = null) {
         $items = MarketBoard::where('is_locked', false)->get();
         $items = new Collection($items, $transformer);
         $items = $manager->createData($items)->toArray();
 
-        event(new UpdateMarketBoardBroadcastEvent(auth()->user(), $items, auth()->user()->character->gold));
+        if (is_null($user)) {
+            $user = auth()->user();
+        }
+
+        event(new UpdateMarketBoardBroadcastEvent($user, $items, $user->character->gold));
     }
 }

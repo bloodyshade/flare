@@ -3,6 +3,7 @@
         <x-cards.card additionalClasses="overflow-table">
             <div class="row pb-2">
                 <x-data-tables.per-page wire:model="perPage">
+<<<<<<< HEAD
                     @auth
                         @if(!is_null($character) || auth()->user()->hasRole('Admin'))
                             <div class="btn-group">
@@ -25,6 +26,29 @@
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="#" href="#" wire:click="setType('reset')">Reset</a>
                                 </div>
+=======
+                    @if ($this->type !== 'alchemy')
+                        <div class="btn-group">
+                            <button type="button" class="ml-2 btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Type
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#" wire:click="setType('weapon')">Weapon</a>
+                                <a class="dropdown-item" href="#" wire:click="setType('bow')">Bow</a>
+                                <a class="dropdown-item" href="#" wire:click="setType('body')">Body</a>
+                                <a class="dropdown-item" href="#" wire:click="setType('shield')">Shield</a>
+                                <a class="dropdown-item" href="#" wire:click="setType('feet')">Feet</a>
+                                <a class="dropdown-item" href="#" wire:click="setType('leggings')">Leggings</a>
+                                <a class="dropdown-item" href="#" wire:click="setType('sleeves')">Sleeves</a>
+                                <a class="dropdown-item" href="#" wire:click="setType('helmet')">Helmet</a>
+                                <a class="dropdown-item" href="#" wire:click="setType('gloves')">Gloves</a>
+                                <a class="dropdown-item" href="#" wire:click="setType('spell-healing')">Spells Healing</a>
+                                <a class="dropdown-item" href="#" wire:click="setType('spell-damage')">Spells Damage</a>
+                                <a class="dropdown-item" href="#" wire:click="setType('ring')">Ring</a>
+                                <a class="dropdown-item" href="#" wire:click="setType('artifact')">Artifact</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#" href="#" wire:click="setType('reset')">Reset</a>
+>>>>>>> 1.1.0
                             </div>
                         @endif
                     @endauth
@@ -129,8 +153,44 @@
                         field="cost"
                     />
 
+                    @if ($showOtherCurrencyCost)
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('gold_dust_cost')"
+                            header-text="Gold Dust Cost"
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="gold_dust_cost"
+                        />
+
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('shards_cost')"
+                            header-text="Shards Cost"
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="shards_cost"
+                        />
+                    @endif
+
+                    @if ($showSkillInfo)
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('skill_level_required')"
+                            header-text="Skill Level Required"
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="skill_level_required"
+                        />
+
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('skill_level_trivial')"
+                            header-text="Skill Level Trivial"
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="skill_level_trivial"
+                        />
+                    @endif
+
                     @guest
-                    @elseif (!is_null($character))
+                    @elseif (auth()->user()->hasRole('Admin'))
                         <x-data-tables.header-row>
                             Actions
                         </x-data-tables.header-row>
@@ -177,22 +237,43 @@
                                             </a>
                                         </td>
                                 @else
-                                    <td>
-                                        <a href="{{route('items.item', [
+                                    @if (auth()->user()->hasRole('Admin'))
+                                        <td>
+                                            <a href="{{route('items.item', [
+                                                'item' => $item->id
+                                            ])}}">
+                                                <x-item-display-color :item="$item" />
+                                            </a>
+                                        </td>
+                                    @else
+                                        <td>
+                                            <a href="{{route('game.items.item', [
                                             'item' => $item->id
                                         ])}}">
-                                            <x-item-display-color :item="$item" />
-                                        </a>
-                                    </td>
+                                                <x-item-display-color :item="$item" />
+                                            </a>
+                                        </td>
+                                    @endif
                                 @endif
                             @endguest
 
 
                             <td>{{$item->type}}</td>
-                            <td>{{is_null($item->base_damage) ? 'N/A' : $item->base_damage}}</td>
-                            <td>{{is_null($item->base_ac) ? 'N/A' : $item->base_ac}}</td>
-                            <td>{{is_null($item->base_healing) ? 'N/A' : $item->base_healing}}</td>
-                            <td>{{is_null($item->cost) ? 'N/A' : number_format($item->cost)}}</td>
+                            <td>{{is_null($item->base_damage) ? 0 : $item->base_damage}}</td>
+                            <td>{{is_null($item->base_ac) ? 0 : $item->base_ac}}</td>
+                            <td>{{is_null($item->base_healing) ? 0 : $item->base_healing}}</td>
+                            <td>{{is_null($item->cost) ? 0 : number_format($item->cost)}}</td>
+
+                            @if ($showOtherCurrencyCost)
+                                <td>{{is_null($item->gold_dust_cost) ? 0 : number_format($item->gold_dust_cost)}}</td>
+                                <td>{{is_null($item->shards_cost) ? 0 : number_format($item->shards_cost)}}</td>
+                            @endif
+
+                            @if ($showSkillInfo)
+                                <td>{{$item->skill_level_required}}</td>
+                                <td>{{$item->skill_level_trivial}}</td>
+                            @endif
+
                             @guest
                             @else
                                 <td>

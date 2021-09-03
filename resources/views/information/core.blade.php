@@ -6,6 +6,7 @@
             <x-common.cards.card>
                 <div class="prose-lg md:prose-xl max-w-full">
                     @markdown($section['content'])
+                    </x-cards.card>
                 </div>
             </x-common.cards.card>
 
@@ -19,7 +20,11 @@
 
                 <div class="mb-3 mt-3">
                     @livewire($section['view'], [
-                        'only'   => $section['only']
+                        'only'          => $section['only'],
+                        'showSkillInfo' => $section['showSkillInfo'],
+                        'showDropDown'  => $section['showDropDown'],
+                        'type'          => $section['type'],
+                        'craftOnly'     => $section['craftOnly'],
                     ])
                 </div>
                 @else

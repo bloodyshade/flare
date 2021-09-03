@@ -3,6 +3,10 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Mail\GenericMail;
+use App\Flare\Models\Npc;
+use App\Flare\Values\NpcCommandTypes;
+use App\Flare\Values\NpcTypes;
+use App\Game\Kingdoms\Events\UpdateUnitMovementLogs;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -53,7 +57,7 @@ class KingdomsAttackService {
     }
 
     public function attackKingdom(Character $character, int $defenderId, array $params) {
-        $defender = Kingdom::find($defenderId);
+        $defender = Kingdom::where('id', $defenderId)->where('game_map_id', $character->map->game_map_id)->first();
 
         if (is_null($defender)) {
             return $this->errorResult('Defender kingdom does not exist for: ' . $defenderId);
@@ -101,6 +105,8 @@ class KingdomsAttackService {
                 $kingdom = $this->manager->createData($kingdom)->toArray();
 
                 event(new UpdateKingdom($character->user, $kingdom));
+
+                event(new UpdateUnitMovementLogs($character));
             }
         }
 
@@ -169,15 +175,25 @@ class KingdomsAttackService {
     }
 
     protected function globalAttackMessage(Kingdom $defender, Character $character) {
-        $mapName               = $defender->gameMap->name;
-        $defenderCharacterName = $defender->character->name;
+        $defenderCharacterName = null;
 
+        if (is_null($defender->character_id)) {
+            $defenderCharacterName = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first()->real_name . ' (NPC)';
+        } else {
+            $defenderCharacterName = $defender->character->name;
+        }
+
+        $mapName = $defender->gameMap->name;
         $message = $character->name . ' Has launched an attack against: ' . $defenderCharacterName . ' on the ' . $mapName . ' plane.';
 
         broadcast(new GlobalMessageEvent($message));
     }
 
     protected function alertDefenderToAttack(Kingdom $defender) {
+        if (is_null($defender->character_id)) {
+            return;
+        }
+
         $mapName = $defender->gameMap->name;
         $user    = $defender->character->user;
 

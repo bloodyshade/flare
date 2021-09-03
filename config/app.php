@@ -195,6 +195,7 @@ return [
         */
         App\Game\Core\Providers\ServiceProvider::class,
         App\Game\Core\Providers\EventsProvider::class,
+        App\Game\Battle\Providers\ServiceProvider::class,
         App\Game\Messages\Providers\EventsProvider::class,
         App\Game\Messages\Providers\ServiceProvider::class,
         App\Game\Maps\Providers\EventsProvider::class,
@@ -203,6 +204,7 @@ return [
         App\Game\Maps\Providers\ServiceProvider::class,
         App\Game\Kingdoms\Providers\ServiceProvider::class,
         App\Game\Skills\Providers\ServiceProvider::class,
+        App\Game\Market\Providers\ServiceProvider::class,
     ],
 
     /*
@@ -259,6 +261,8 @@ return [
          * Game Related
          */
         'KingdomLogStatus' => \App\Flare\Values\Wrappers\KingdomLogStatusHelper::class,
+        'NpcCommandType'   => \App\Flare\Values\Wrappers\NpcCommandTypeHelper::class,
+        'ItemEffects'      => \App\Flare\Values\Wrappers\ItemEffectsHelper::class,
         'GameVersion'      => \App\Flare\Values\GameVersionHelper::class,
     ],
 

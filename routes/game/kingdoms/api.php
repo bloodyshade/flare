@@ -1,8 +1,8 @@
 <?php
 
-Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:25,2'])->group(function() {
-    Route::get('/kingdoms/{kingdom}', ['as' => 'kingdoms.location', 'uses' => 'Api\KingdomsController@getLocationData']);
+Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:120,1'])->group(function() {
     Route::get('/kingdoms/{character}/kingdoms-with-units', ['as' => 'kingdoms.with.units', 'uses' => 'Api\KingdomAttackController@fetchKingdomsWithUnits']);
+    Route::get('/kingdoms/{character}/{kingdom}', ['as' => 'kingdoms.location', 'uses' => 'Api\KingdomsController@getLocationData']);
     Route::get('/kingdom-unit-movement/{character}', ['as' => 'kingdom.unit.movement', 'uses' => 'Api\KingdomUnitMovementController@fetchUnitMovement']);
 
     Route::post('/kingdoms/{character}/settle', ['as' => 'kingdoms.settle', 'uses' => 'Api\KingdomsController@settle']);
@@ -20,5 +20,6 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:25,2'
 
     Route::post('/kingdoms/{character}/attack/selection', ['as' => 'kingdom.attack.selection', 'uses' => 'Api\KingdomAttackController@selectKingdoms']);
     Route::post('/kingdoms/{character}/attack', ['as' => 'kingdom.atack', 'uses' => 'Api\KingdomAttackController@attack']);
+    Route::post('/use-items-on-kingdom/{character}', ['as' => 'kingdom.attack-with-items', 'uses' => 'Api\KingdomAttackController@useItems']);
     Route::post('/recall-units/{unitMovementQueue}/{character}', ['as' => 'recall.units', 'uses' => 'Api\KingdomUnitMovementController@recallUnits']);
 });

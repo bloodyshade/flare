@@ -85,7 +85,7 @@ class CraftingService {
         }
 
         $characterRoll = $this->characterRoll($skill);
-        $dcCheck       = $this->getDCCheck($skill);
+        $dcCheck       = $this->getDCCheck($skill, 0);
 
         if ($dcCheck < $characterRoll) {
             $this->pickUpItem($character, $item, $skill);
@@ -96,8 +96,6 @@ class CraftingService {
         event(new ServerMessageEvent($character->user, 'failed_to_craft'));
 
         $this->updateCharacterGold($character, $item->cost, $skill);
-
-        return;
     }
 
     protected function fetchCraftingSkill(Character $character, string $craftingType): Skill {
@@ -119,13 +117,14 @@ class CraftingService {
 
             if (!$tooEasy) {
                 event(new UpdateSkillEvent($skill));
-                $this->updateCharacterGold($character, $item->cost);
             }
+
+            $this->updateCharacterGold($character, $item->cost);
         }
     }
 
     private function attemptToPickUpItem(Character $character, Item $item): bool {
-        if ($character->inventory->slots->count() !== $character->inventory_max) {
+        if (!$character->isInventoryFull()) {
 
             $character->inventory->slots()->create([
                 'item_id'      => $item->id,

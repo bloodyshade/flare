@@ -19,7 +19,7 @@ class CharacterRewardService {
 
     /**
      * Constructor
-     * 
+     *
      * @param Character $character
      * @return void
      */
@@ -29,7 +29,7 @@ class CharacterRewardService {
 
     /**
      * Distribute the gold and xp to the character.
-     * 
+     *
      * @param Monster $monster
      * @param Adventure $adventure | null
      * @return void
@@ -37,14 +37,21 @@ class CharacterRewardService {
     public function distributeGoldAndXp(Monster $monster, Adventure $adventure = null) {
         $currentSkill = $this->fetchCurrentSkillInTraining();
         $xpReduction  = 0.0;
-        
+        $gameMap      = $this->character->map->gameMap;
+
         if (!is_null($currentSkill)) {
             $xpReduction = $currentSkill->xp_towards;
 
-            $this->trainSkill($currentSkill, $adventure);
+            $this->trainSkill($currentSkill, $adventure, $monster);
         }
 
-        $this->character->xp   += XPCalculator::fetchXPFromMonster($monster, $this->character->level, $xpReduction);
+        $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level, $xpReduction);
+
+        if (!is_null($gameMap->xp_bonus)) {
+            $xp = $xp * (1 + $gameMap->xp_bonus);
+        }
+
+        $this->character->xp   += $xp;
         $this->character->gold += $monster->gold;
 
         $this->character->save();
@@ -52,7 +59,7 @@ class CharacterRewardService {
 
     /**
      * Get the refreshed Character
-     * 
+     *
      * @return Character
      */
     public function getCharacter(): Character {
@@ -61,7 +68,7 @@ class CharacterRewardService {
 
     /**
      * Get the skill in trainind or null
-     * 
+     *
      * @return mixed
      */
     public function fetchCurrentSkillInTraining() {
@@ -72,12 +79,12 @@ class CharacterRewardService {
 
     /**
      * Fire the update skill event.
-     * 
+     *
      * @param Skill $skill
      * @param Adventure $adventure | nul
      * @return void
      */
-    public function trainSkill(Skill $skill, Adventure $adventure = null) {
-        event(new UpdateSkillEvent($skill, $adventure));
+    public function trainSkill(Skill $skill, Adventure $adventure = null, Monster $monster = null) {
+        event(new UpdateSkillEvent($skill, $adventure, $monster));
     }
 }

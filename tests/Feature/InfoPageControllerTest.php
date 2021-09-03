@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Flare\Models\Location;
+use App\Flare\Models\Monster;
 use Storage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\GameClass;
@@ -9,6 +11,13 @@ use App\Flare\Models\GameRace;
 use App\Flare\Models\GameSkill;
 use Tests\TestCase;
 use Tests\Traits\CreateAdventure;
+use Tests\Traits\CreateGameBuilding;
+use Tests\Traits\CreateGameBuildingUnit;
+use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateGameUnit;
+use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemAffix;
+use Tests\Traits\CreateLocation;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameSkill;
@@ -19,7 +28,14 @@ class InfoPageControllerTest extends TestCase
         CreateAdventure,
         createClass,
         createRace,
-        CreateGameSkill;
+        CreateGameSkill,
+        CreateGameMap,
+        CreateLocation,
+        CreateGameBuilding,
+        CreateGameUnit,
+        CreateGameBuildingUnit,
+        CreateItem,
+        CreateItemAffix;
 
     public function setUp(): void {
         parent::setUp();
@@ -82,8 +98,8 @@ class InfoPageControllerTest extends TestCase
         $this->createRace(['name' => 'Human']);
 
         $this->visitRoute('info.page.race', [
-            'race' => 1,
-        ])->see(GameRace::find(1)->name);
+            'race' => GameRace::first()->id,
+        ])->see(GameRace::first()->name);
     }
 
     public function testViewClass() {
@@ -92,8 +108,8 @@ class InfoPageControllerTest extends TestCase
         $this->createClass(['name' => 'Fighter']);
 
         $this->visitRoute('info.page.class', [
-            'class' => 1,
-        ])->see(GameClass::find(1)->name);
+            'class' => GameClass::first()->id,
+        ])->see(GameClass::first()->name);
     }
 
     public function testViewSkill() {
@@ -104,8 +120,38 @@ class InfoPageControllerTest extends TestCase
         ]);
 
         $this->visitRoute('info.page.skill', [
-            'skill' => 1,
-        ])->see(GameSkill::find(1)->name);
+            'skill' => GameSkill::first()->id,
+        ])->see(GameSkill::first()->name);
+    }
+
+    public function testViewMonster() {
+        $this->artisan('move:files');
+
+        $this->createMonster([
+            'name' => 'Sample'
+        ]);
+
+        $this->visitRoute('info.page.monster', [
+            'monster' => Monster::first()->id,
+        ])->see(Monster::first()->name);
+    }
+
+    public function testViewLocation() {
+        $this->artisan('move:files');
+
+        $map = $this->createGameMap();
+
+        $this->createLocation([
+            'name' => 'Sample',
+            'game_map_id' => $map->id,
+            'description' => 'sample',
+            'x' => 16,
+            'y' => 16,
+        ]);
+
+        $this->visitRoute('info.page.location', [
+            'location' => Location::first()->id,
+        ])->see(Location::first()->name);
     }
 
     public function testViewAdventure() {
@@ -116,5 +162,43 @@ class InfoPageControllerTest extends TestCase
         $this->visitRoute('info.page.adventure', [
             'adventure' => $adventure->id,
         ])->see($adventure->name);
+    }
+
+    public function testViewItem() {
+        $this->artisan('move:files');
+
+        $item = $this->createItem(['name' => 'Sample']);
+
+        $this->visitRoute('info.page.item', [
+            'item' => $item->id,
+        ])->see($item->name);
+    }
+
+    public function testViewAffix() {
+        $this->artisan('move:files');
+
+        $itemAffix = $this->createItemAffix(['name' => 'Sample']);
+
+        $this->visitRoute('info.page.affix', [
+            'affix' => $itemAffix->id,
+        ])->see($itemAffix->name);
+    }
+
+    public function testViewGameUnit() {
+        $this->artisan('move:files');
+
+        $gameBuilding = $this->createGameBuilding();
+        $gameUnit     = $this->createGameUnit([
+            'name' => 'Sample'
+        ]);
+
+        $this->createGameBuildingUnit([
+            'game_building_id' => $gameBuilding->id,
+            'game_unit_id'     => $gameUnit->id,
+        ]);
+
+        $this->visitRoute('info.page.unit', [
+            'unit' => $gameUnit->id,
+        ])->see($gameUnit->name);
     }
 }

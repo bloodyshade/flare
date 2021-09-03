@@ -54,7 +54,7 @@ class ItemComparisonTest extends TestCase
         $this->character = (new CharacterFactory)->createBaseCharacter()
                                                ->inventoryManagement()
                                                ->giveItem($itemForCharacter)
-                                               ->equipLeftHand()
+                                               ->equipLeftHand($itemForCharacter->name)
                                                ->getCharacterFactory();
     }
 
@@ -66,13 +66,13 @@ class ItemComparisonTest extends TestCase
 
         $itemComparison = new ItemComparison();
 
-        $this->assertTrue(empty($itemComparison->fetchDetails($this->item, $character->inventory->slots)));
+        $this->assertTrue(empty($itemComparison->fetchDetails($this->item, $character->inventory->slots, $character)));
     }
 
     public function testWeaponIsBetter() {
         $itemComparison  = new ItemComparison();
         $character = $this->character->getCharacter();
-        $comparisonDetails = $itemComparison->fetchDetails($this->item, $character->inventory->slots);
+        $comparisonDetails = $itemComparison->fetchDetails($this->item, $character->inventory->slots, $character);
 
         $this->assertFalse(empty($comparisonDetails));
 
@@ -91,7 +91,7 @@ class ItemComparisonTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $comparisonDetails = $itemComparison->fetchDetails($this->item, $character->inventory->slots);
+        $comparisonDetails = $itemComparison->fetchDetails($this->item, $character->inventory->slots, $character);
 
         $this->assertFalse(empty($comparisonDetails));
 
@@ -111,11 +111,11 @@ class ItemComparisonTest extends TestCase
                           ->getCharacterFactory();
 
 
-        $character = $character->inventoryManagement()->equipItem( 'left-hand', 2)->getCharacter();
+        $character = $character->inventoryManagement()->equipItem( 'left-hand', $this->item->name)->getCharacter();
 
         $downGradedItem = $character->inventory->slots->first()->item;
 
-        $comparisonDetails = $itemComparison->fetchDetails($downGradedItem, $character->inventory->slots);
+        $comparisonDetails = $itemComparison->fetchDetails($downGradedItem, $character->inventory->slots, $character);
 
         $this->assertFalse(empty($comparisonDetails));
 
@@ -129,7 +129,7 @@ class ItemComparisonTest extends TestCase
         $itemComparison    = new ItemComparison();
         $character         = $this->character->getCharacter();
         $sameItem          = $character->inventory->slots->first()->item;
-        $comparisonDetails = $itemComparison->fetchDetails($sameItem, $character->inventory->slots);
+        $comparisonDetails = $itemComparison->fetchDetails($sameItem, $character->inventory->slots, $character);
 
         $this->assertFalse(empty($comparisonDetails));
 
@@ -160,12 +160,12 @@ class ItemComparisonTest extends TestCase
 
         $character = $this->character->InventoryManagement()
                                      ->giveitem($itemToEquip)
-                                     ->equipItem('hands', 2)
+                                     ->equipItem('hands', $itemToEquip->name)
                                      ->getCharacter();
 
         $inventory = $character->inventory->slots()->where('equipped', true)->where('position', $itemToEquip->default_position)->get();
 
-        $comparison = $itemComparison->fetchDetails($itemForComparison, $inventory);
+        $comparison = $itemComparison->fetchDetails($itemForComparison, $inventory, $character);
 
         $this->assertTrue(isset($comparison['hands']));
         $this->assertNotNull($comparison['hands']['replaces_item']);
@@ -192,12 +192,12 @@ class ItemComparisonTest extends TestCase
 
         $character = $this->character->InventoryManagement()
                                      ->giveitem($itemToEquip)
-                                     ->equipItem('hands', 2)
+                                     ->equipItem('hands', $itemToEquip->name)
                                      ->getCharacter();
 
         $inventory = $character->inventory->slots()->where('equipped', true)->where('position', $itemToEquip->default_position)->get();
 
-        $comparison = $itemComparison->fetchDetails($itemForComparison, $inventory);
+        $comparison = $itemComparison->fetchDetails($itemForComparison, $inventory, $character);
 
         $this->assertTrue(isset($comparison['hands']));
         $this->assertNull($comparison['hands']['replaces_item']);
@@ -222,12 +222,12 @@ class ItemComparisonTest extends TestCase
 
         $character = $this->character->InventoryManagement()
                                      ->giveitem($itemToEquip)
-                                     ->equipItem('spell_one', 2)
+                                     ->equipItem('spell_one', $itemToEquip->name)
                                      ->getCharacter();
 
         $inventory = $character->inventory->slots()->where('equipped', true)->where('position', 'spell_one')->get();
 
-        $comparison = $itemComparison->fetchDetails($itemForComparison, $inventory);
+        $comparison = $itemComparison->fetchDetails($itemForComparison, $inventory, $character);
 
         $this->assertTrue(isset($comparison['spell_one']));
         $this->assertNull($comparison['spell_one']['replaces_item']);
@@ -252,12 +252,12 @@ class ItemComparisonTest extends TestCase
 
         $character = $this->character->InventoryManagement()
                                      ->giveitem($itemToEquip)
-                                     ->equipItem('spell_one', 2)
+                                     ->equipItem('spell_one', $itemToEquip->name)
                                      ->getCharacter();
 
         $inventory = $character->inventory->slots()->where('equipped', true)->where('position', 'spell_one')->get();
 
-        $comparison = $itemComparison->fetchDetails($itemForComparison, $inventory);
+        $comparison = $itemComparison->fetchDetails($itemForComparison, $inventory, $character);
 
         $this->assertTrue(isset($comparison['spell_one']));
         $this->assertNotNull($comparison['spell_one']['replaces_item']);
@@ -284,12 +284,12 @@ class ItemComparisonTest extends TestCase
 
         $character = $this->character->InventoryManagement()
                                      ->giveitem($itemToEquip)
-                                     ->equipItem('spell_one', 2)
+                                     ->equipItem('spell_one', $itemToEquip->name)
                                      ->getCharacter();
 
         $inventory = $character->inventory->slots()->where('equipped', true)->where('position', 'spell_one')->get();
 
-        $comparison = $itemComparison->fetchDetails($itemForComparison, $inventory);
+        $comparison = $itemComparison->fetchDetails($itemForComparison, $inventory, $character);
 
         $this->assertTrue(isset($comparison['spell_one']));
         $this->assertNull($comparison['spell_one']['replaces_item']);
@@ -310,7 +310,7 @@ class ItemComparisonTest extends TestCase
 
         $inventory = $character->inventory->slots()->where('equipped', true)->where('position', $itemForComparison->default_position)->get();
 
-        $comparison = $itemComparison->fetchDetails($itemForComparison, $inventory);
+        $comparison = $itemComparison->fetchDetails($itemForComparison, $inventory, $character);
 
         $this->assertTrue(empty($comparison));
     }

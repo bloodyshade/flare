@@ -5,12 +5,7 @@ namespace App\Flare\Models;
 use App\Flare\Builders\CharacterInformationBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Flare\Models\GameRace;
-use App\Flare\Models\GameClass;
-use App\Flare\Models\Skill;
-use App\Flare\Models\Inventory;
 use App\Flare\Models\Traits\WithSearch;
-use App\Flare\Models\User;
 use Database\Factories\CharacterFactory;
 
 class Character extends Model
@@ -40,6 +35,10 @@ class Character extends Model
         'can_craft_again_at',
         'can_adventure_again_at',
         'force_name_change',
+        'spell_evasion',
+        'artifact_annulment',
+        'is_npc',
+        'is_test',
         'level',
         'xp',
         'xp_next',
@@ -48,8 +47,12 @@ class Character extends Model
         'dex',
         'chr',
         'int',
+        'agi',
+        'focus',
         'ac',
         'gold',
+        'gold_dust',
+        'shards',
     ];
 
     /**
@@ -65,6 +68,8 @@ class Character extends Model
         'can_adventure'          => 'boolean',
         'is_dead'                => 'boolean',
         'force_name_change'      => 'boolean',
+        'is_npc'                 => 'boolean',
+        'is_test'                => 'boolean',
         'can_move_again_at'      => 'datetime',
         'can_attack_again_at'    => 'datetime',
         'can_craft_again_at'     => 'datetime',
@@ -77,8 +82,12 @@ class Character extends Model
         'dex'                    => 'integer',
         'chr'                    => 'integer',
         'int'                    => 'integer',
+        'agi'                    => 'integer',
+        'focus'                  => 'integer',
         'ac'                     => 'integer',
         'gold'                   => 'integer',
+        'gold_dust'              => 'integer',
+        'shards'                 => 'integer',
     ];
 
     public function race() {
@@ -99,6 +108,10 @@ class Character extends Model
 
     public function inventory() {
         return $this->hasOne(Inventory::class, 'character_id', 'id');
+    }
+
+    public function inventorySets() {
+        return $this->hasMany(InventorySet::class, 'character_id', 'id');
     }
 
     public function map() {
@@ -125,10 +138,6 @@ class Character extends Model
         return $this->hasMany(Notification::class, 'character_id', 'id');
     }
 
-    public function snapShots() {
-        return $this->hasMany(CharacterSnapShot::class, 'character_id', 'id');
-    }
-
     public function kingdoms() {
         return $this->hasMany(Kingdom::class, 'character_id', 'id');
     }
@@ -139,6 +148,14 @@ class Character extends Model
 
     public function unitMovementQueues() {
         return $this->hasMany(UnitMovementQueue::class);
+    }
+
+    public function boons() {
+        return $this->hasMany(CharacterBoon::class);
+    }
+
+    public function questsCompleted() {
+        return $this->hasMany(QuestsCompleted::class);
     }
 
     public function getXpAttribute($value) {
@@ -157,6 +174,28 @@ class Character extends Model
         $info = resolve(CharacterInformationBuilder::class);
 
         return $info->setCharacter($this);
+    }
+
+    /**
+     * Gets the inventory count.
+     *
+     * Excludes quest and equipped items.
+     *
+     * @return int
+     */
+    public function getInventoryCount(): int {
+        return $this->inventory->slots->filter(function($slot) {
+            return $slot->item->type !== 'quest' && !$slot->equipped;
+        })->count();
+    }
+
+    /**
+     * Is the inventory full?
+     *
+     * @return bool
+     */
+    public function isInventoryFull(): bool {
+        return $this->getInventoryCount() === $this->inventory_max;
     }
 
     protected static function newFactory() {

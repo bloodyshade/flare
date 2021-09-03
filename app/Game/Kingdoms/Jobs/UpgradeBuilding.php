@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
+use App\Flare\Jobs\SendOffEmail;
 use App\Flare\Mail\GenericMail;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\BuildingInQueue;
@@ -119,7 +120,18 @@ class UpgradeBuilding implements ShouldQueue
             ]);
         }
 
-        BuildingInQueue::where('to_level', $level)->where('building_id', $this->building->id)->where('kingdom_id', $this->building->kingdom_id)->first()->delete();
+        $characterId = $this->building->kingdom->character_id;
+
+        $buildingInQue = BuildingInQueue::where('building_id', $this->building->id)->where('kingdom_id', $this->building->kingdom_id)->where('character_id', $characterId)->first();
+
+        if (!is_null($buildingInQue)) {
+            $buildingInQue->delete();
+        } else {
+            $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
+            $message   = 'Building queue failed to clear: Building Id: ' . $this->building->id . ' KingdomId: ' . $this->building->kingdom_id;
+
+            SendOffEmail::dispatch($adminUser, (new GenericMail($adminUser, $message, 'Failed To Clear Building Queue')))->delay(now()->addMinutes(1));
+        }
 
         if (UserOnlineValue::isOnline($this->user)) {
             $kingdom = Kingdom::find($this->building->kingdom_id);
@@ -132,13 +144,13 @@ class UpgradeBuilding implements ShouldQueue
             $x = $this->building->kingdom->x_position;
             $y = $this->building->kingdom->y_position;
 
-            $character = $this->user->character;
+            if ($this->user->show_building_upgrade_messages) {
+                $message = $this->building->name . ' finished upgrading for kingdom: ' .
+                    $this->building->kingdom->name . ' on plane: ' . $plane .
+                    ' At (X/Y) ' . $x . '/' . $y . ' and is now level: ' . $level;
 
-            $message = $this->building->name . ' finished upgrading for kingdom: ' .
-                $this->building->kingdom->name . ' on plane: ' . $plane .
-                ' At (X/Y) '.$x.'/'.$y.' and is now level: ' . $level;
-
-            event(new ServerMessageEvent($this->user, 'building-upgrade-finished', $message));
+                event(new ServerMessageEvent($this->user, 'building-upgrade-finished', $message));
+            }
         } else if ($this->user->upgraded_building_email) {
             Mail::to($this->user)->send(new UpgradedBuilding(
                 $this->user,

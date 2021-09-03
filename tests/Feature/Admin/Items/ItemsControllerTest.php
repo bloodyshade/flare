@@ -3,6 +3,7 @@
 namespace Tests\Feature\Admin\Items;
 
 use App\Admin\Exports\Items\ItemsExport;
+use App\Admin\Exports\Items\NpcsExport;
 use Event;
 use Illuminate\Http\UploadedFile;
 use Maatwebsite\Excel\Facades\Excel;
@@ -33,7 +34,7 @@ class ItemsControllerTest extends TestCase
 
         $role = $this->createAdminRole();
 
-        $this->user = $this->createAdmin([], $role);
+        $this->user = $this->createAdmin($role, []);
 
         $this->item = $this->createItem();
     }
@@ -85,7 +86,7 @@ class ItemsControllerTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()
                                            ->inventoryManagement()
                                            ->giveItem($this->item)
-                                           ->equipLeftHand()
+                                           ->equipLeftHand($this->item->name)
                                            ->getCharacterFactory();
 
         $this->actingAs($this->user)->post(route('items.delete', [
@@ -110,7 +111,7 @@ class ItemsControllerTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()
                                            ->inventoryManagement()
                                            ->giveItem($this->item)
-                                           ->equipLeftHand()
+                                           ->equipLeftHand($this->item->name)
                                            ->getCharacterFactory();
 
         $this->actingAs($this->user)->post(route('items.delete.all', [
@@ -150,10 +151,12 @@ class ItemsControllerTest extends TestCase
         $response->assertSessionHas('error', 'Invalid input.');
     }
 
+    public function testCanSeeExportPageForItems() {
+        $this->actingAs($this->user)->visit(route('items.export'))->see('Export');
+    }
+
     public function testCanExportItems() {
         Excel::fake();
-
-        $this->actingAs($this->user)->visit(route('items.export'))->see('Export');
 
         $this->actingAs($this->user)->post(route('items.export-data'));
 
@@ -162,11 +165,11 @@ class ItemsControllerTest extends TestCase
         });
     }
 
-    public function testCanSeeImportPage() {
+    public function testCanSeeItemsImportPage() {
         $this->actingAs($this->user)->visit(route('items.import'))->see('Import Item Data');
     }
 
-    public function testCanImportMonsters() {
+    public function testCanImportItems() {
         $this->actingAs($this->user)->post(route('items.import-data', [
             'items_import' => new UploadedFile(resource_path('data-imports/items.xlsx'), 'items.xlsx')
         ]));

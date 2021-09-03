@@ -6,6 +6,7 @@ use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Services\CharacterRewardService;
+use App\Game\Core\Events\CharacterLevelUpEvent;
 use App\Game\Core\Events\UpdateCharacterEvent;
 use App\Game\Core\Services\CharacterService;
 
@@ -19,7 +20,7 @@ class UpdateCharacterListener
 
     /**
      * Constructor
-     * 
+     *
      * @param CharacterService $characterService
      * @return void
      */
@@ -30,12 +31,11 @@ class UpdateCharacterListener
     /**
      * Handle the event.
      *
-     * @param  \App\Game\Battle\UpdateCharacterEvent  $event
+     * @param UpdateCharacterEvent $event
      * @return void
      */
     public function handle(UpdateCharacterEvent $event)
     {
-
         $characterRewardService = resolve(CharacterRewardService::class, [
             'character' => $event->character,
         ]);
@@ -44,17 +44,6 @@ class UpdateCharacterListener
 
         $character = $characterRewardService->getCharacter();
 
-        if ($character->xp >= $event->character->xp_next) {
-            $this->characterService->levelUpCharacter($character);
-
-            $character->refresh();
-
-            event(new ServerMessageEvent($character->user, 'level_up'));
-            event(new UpdateTopBarEvent($character));
-            event(new UpdateCharacterAttackEvent($character));
-
-        } else {
-            event(new UpdateTopBarEvent($character));
-        }
+        event(new CharacterLevelUpEvent($character));
     }
 }

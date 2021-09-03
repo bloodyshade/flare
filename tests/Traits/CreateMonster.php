@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
 use App\Flare\Values\BaseSkillValue;
-use Tests\Traits\CreateGameSkill;
 
 trait CreateMonster {
 
@@ -43,14 +42,14 @@ trait CreateMonster {
     }
 
     protected function fetchSkills(): Collection {
-        $skills = GameSkill::where('specifically_assigned', false)->get();
+        $skills = GameSkill::whereNull('game_class_id')->get();
 
         if ($skills->isEmpty()) {
             $this->createGameSkill(['name' => 'Accuracy']);
             $this->createGameSkill(['name' => 'Dodge']);
             $this->createGameSkill(['name' => 'Looting']);
 
-            return GameSkill::where('specifically_assigned', false)->get();
+            return GameSkill::whereNull('game_class_id')->get();
         }
 
         return $skills;

@@ -2,6 +2,7 @@
 
 namespace App\Admin\Providers;
 
+use App\Charts\AllCharacterGoldChart;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use ConsoleTVs\Charts\Registrar as Charts;
 use App\Admin\Console\Commands\CreateAdminAccount;
@@ -10,7 +11,7 @@ use App\Admin\Services\AssignSkillService;
 use App\Admin\Services\ItemAffixService;
 use App\Admin\Services\UpdateCharacterStatsService;
 use App\Admin\Services\UserService;
-use App\Charts\BattleSimulationChart;
+use App\Admin\Console\Commands\GiveKingdomsToNpcs;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -37,7 +38,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new UserService();
         });
 
-        $this->commands([CreateAdminAccount::class]);
+        $this->commands([CreateAdminAccount::class, GiveKingdomsToNpcs::class]);
     }
 
     /**
@@ -51,7 +52,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $router = $this->app['router'];
 
         $charts->register([
-            BattleSimulationChart::class,
+            AllCharacterGoldChart::class,
         ]);
 
         $router->aliasMiddleware('is.admin', IsAdminMiddleware::class);

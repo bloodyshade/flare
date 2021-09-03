@@ -28,7 +28,7 @@ class ServerMessageListener
     /**
      * Handle the event.
      *
-     * @param  \App\Flare\Events\CreateCharacterEvent  $event
+     * @param ServerMessageEvent $event
      * @return void
      */
     public function handle(ServerMessageEvent $event)
@@ -45,7 +45,7 @@ class ServerMessageListener
             case 'gained_item':
                 $message = 'You found a: ' . $event->forMessage . ' on the enemies corpse!';
 
-                return broadcast(new ServerMessage($event->user, $message));
+                return broadcast(new ServerMessage($event->user, $message, false, true, $event->link, $event->id));
             case 'found_item':
                 $message = 'You happen upon a: ' . $event->forMessage . '!';
 
@@ -79,6 +79,26 @@ class ServerMessageListener
                 return broadcast(new ServerMessage($event->user, $message));
             case 'new-damage-stat':
                 $message = 'The Creator has changed your classes damage stat to: ' . $event->forMessage . '. Please adjust your gear accordingly for maximum damage.';
+
+                return broadcast(new ServerMessage($event->user, $message));
+            case 'disenchanted':
+                $message = 'Disenchanted the item and got: ' . $event->forMessage . ' Gold Dust.';
+
+                return broadcast(new ServerMessage($event->user, $message));
+            case 'failed-to-disenchant':
+                $message = 'Failed to disenchant the item, it shatters before you into ashes. You only got 1 Gold Dust for your efforts.';
+
+                return broadcast(new ServerMessage($event->user, $message));
+            case 'failed_to_transmute':
+                $message = 'You failed to transmute the item. It melts into a pool of liquid gold dust before evaporating away. Wasted efforts!';
+
+                return broadcast(new ServerMessage($event->user, $message));
+            case 'transmuted':
+                $message = 'You transmuted a new: ' . $event->forMessage . ' It shines with a powerful glow!';
+
+                return broadcast(new ServerMessage($event->user, $message));
+            case 'disenchanted-with-out-skill':
+                $message = 'Disenchanted the item and got: ' . $event->forMessage . ' Gold Dust. No Disenchanting experience was given for destroying the item.';
 
                 return broadcast(new ServerMessage($event->user, $message));
             default:

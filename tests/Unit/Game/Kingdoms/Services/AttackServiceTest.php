@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\KingdomLog;
 use App\Game\Core\Traits\KingdomCache;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -126,8 +127,6 @@ class AttackServiceTest extends TestCase {
         $character = $character->refresh();
 
         $this->assertEquals(2, $character->kingdoms->count());
-        $this->assertEmpty($this->getKingdoms($defender->character));
-        $this->assertCount(2, $this->getKingdoms($character));
     }
 
     public function testTakeKingdomWhenMoraleIsAlreadyAtZero() {
@@ -169,12 +168,11 @@ class AttackServiceTest extends TestCase {
         $character = $character->refresh();
 
         $this->assertEquals(2, $character->kingdoms->count());
-        $this->assertEmpty($this->getKingdoms($defender->character));
-        $this->assertCount(2, $this->getKingdoms($character));
     }
 
     protected function createUnitMovement(Kingdom $defenderKingdom, Kingdom $attackingKingdom): UnitMovementQueue {
         return $this->createUnitMovementQueue([
+            'character_id'       => $attackingKingdom->character->id,
             'from_kingdom_id'    => $attackingKingdom->id,
             'to_kingdom_id'      => $defenderKingdom->id,
             'units_moving'       => $this->getUnitsInMovement($attackingKingdom),

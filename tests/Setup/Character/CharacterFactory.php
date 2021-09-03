@@ -2,10 +2,10 @@
 
 namespace Tests\Setup\Character;
 
-use App\Flare\Models\GameMap;
+use App\Flare\Models\GameClass;
 use Str;
-use Hash;
 use Illuminate\Database\Eloquent\Collection;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
@@ -20,7 +20,6 @@ use Tests\Traits\CreateMap;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateSkill;
 use Tests\Traits\CreateUser;
-use Tests\Traits\CreateSecurityQuestion;
 
 class CharacterFactory {
 
@@ -32,10 +31,11 @@ class CharacterFactory {
         CreateMap,
         CreateGameMap,
         CreateGameSkill,
-        CreateSkill,
-        CreateSecurityQuestion;
+        CreateSkill;
 
-    private $character;
+    private Character $character;
+
+    private $inventorySetManagement;
 
     /**
      * Creates a base character associated with a user.
@@ -46,12 +46,18 @@ class CharacterFactory {
      * - Base Skills: Accuracy, Looting and Dodge.
      *
      * @param array $raceOptions
-     * @param array $classOptions
+     * @param array|GameClass $classOptions
      * @return CharacterFactory
      */
-    public function createBaseCharacter(array $raceOptions = [], array $classOptions = []): CharacterFactory {
+    public function createBaseCharacter(array $raceOptions = [], array|GameClass $classOptions = []): CharacterFactory {
         $race  = $this->createRace($raceOptions);
-        $class = $this->createClass($classOptions);
+
+        if ($classOptions instanceof GameClass) {
+            $class = $classOptions;
+        } else {
+            $class = $this->createClass($classOptions);
+        }
+
         $user  = $this->createUser();
 
         $this->character = $this->createCharacter([
@@ -66,8 +72,6 @@ class CharacterFactory {
             'game_class_id' => $class->id,
             'game_race_id'  => $race->id,
         ]);
-
-        $this->createSecurityQuestions();
 
         $this->createInventory();
 
@@ -101,6 +105,22 @@ class CharacterFactory {
      */
     public function kingdomManagement(): KingdomManagement {
         return new KingdomManagement($this->character, $this);
+    }
+
+    /**
+     * Fetches inventory management.
+     *
+     * Use existing instantiation if it exists.
+     *
+     * @return InventorySetManagement
+     */
+    public function inventorySetManagement(): InventorySetManagement {
+
+        if (is_null($this->inventorySetManagement)) {
+            $this->inventorySetManagement = new InventorySetManagement($this->character, $this);
+        }
+
+        return $this->inventorySetManagement;
     }
 
     /**
@@ -298,16 +318,19 @@ class CharacterFactory {
      *
      * @param GameSkill $skill
      * @param int $level | 1
+     * @param bool $locked
+     * @param array $options
      * @return characterFactory
      */
-    public function assignSkill(GameSkill $skill, int $level = 1): CharacterFactory {
-        $this->character->skills()->create([
+    public function assignSkill(GameSkill $skill, int $level = 1, bool $locked = false, array $options = []): CharacterFactory {
+        $this->character->skills()->create(array_merge([
             'game_skill_id' => $skill->id,
             'character_id'  => $this->character->id,
             'level'         => $level,
             'xp'            => 0,
             'xp_max'        => 100,
-        ]);
+            'is_locked'     => $locked,
+        ], $options));
 
         return $this;
     }
@@ -381,20 +404,17 @@ class CharacterFactory {
     }
 
     /**
-     * Gets the users security Questions
-     *
-     * @return Collection
+     * Create the core inventory.
      */
-    public function getSecurityQuestions(): Collection {
-        return $this->getUser()->securityQuestions;
-    }
-
     protected function createInventory() {
         $this->character->inventory()->create([
             'character_id' => $this->character->id,
         ]);
     }
 
+    /**
+     * Assign Base Skills
+     */
     protected function assignBaseSkills() {
         $accuracy = $this->createGameSkill(['name' => 'Accuracy']);
         $dodge    = $this->createGameSkill(['name' => 'Dodge']);
@@ -413,23 +433,6 @@ class CharacterFactory {
         $this->createSkill([
             'character_id'  => $this->character->id,
             'game_skill_id' => $looting->id,
-        ]);
-    }
-
-    protected function createSecurityQuestions() {
-
-        $user = $this->getUser();
-
-        $this->createSecurityQuestion([
-            'user_id'  => $user->id,
-            'question' => 'test question',
-            'answer'   => Hash::make('test'),
-        ]);
-
-        $this->createSecurityQuestion([
-            'user_id'  => $this->character->user->id,
-            'question' => 'test question 2',
-            'answer'   => Hash::make('test2'),
         ]);
     }
 

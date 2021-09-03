@@ -3,6 +3,7 @@
 namespace App\Game\Maps\Services;
 
 use App\Game\Maps\Events\MoveTimeOutEvent;
+use App\Game\Maps\Events\UpdateGlobalCharacterCountBroadcast;
 use App\Game\Maps\Values\MapTileValue;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
@@ -85,6 +86,14 @@ class TraverseService {
             return !empty($hasItem);
         }
 
+        if ($gameMap->name === 'Dungeons') {
+            $hasItem = $character->inventory->slots->filter(function($slot) {
+                return $slot->item->effect === ItemEffectsValue::DUNGEON;
+            })->all();
+
+            return !empty($hasItem);
+        }
+
         if ($gameMap->name === 'Surface') {
             return true;
         }
@@ -99,6 +108,8 @@ class TraverseService {
      * @param Character $character
      */
     public function travel(int $mapId, Character $character) {
+        $oldMap = $character->map->game_map_id;
+
         $character->map()->update([
             'game_map_id' => $mapId
         ]);
@@ -118,11 +129,12 @@ class TraverseService {
         if ($newXPosition !== $xPosition && $newYPosition !== $yPosition) {
             $color = $this->mapTileValue->getTileColor($character, $xPosition, $yPosition);
 
-            if ($this->mapTileValue->isWaterTile($color)) {
-                event(new ServerMessageEvent($character->user, 'moved-location', 'Your character was moved as you can\'t walk on water.'));
+            if ($this->mapTileValue->isWaterTile($color) || $this->mapTileValue->isDeathWaterTile($color)) {
+                event(new ServerMessageEvent($character->user, 'moved-location', 'Your character was moved as you are missing the appropriate quest item.'));
             }
         }
 
+        $this->updateGlobalCharacterMapCount($oldMap);
         $this->updateMap($character);
         $this->updateActions($mapId, $character);
         $this->updateCharacterTimeOut($character);
@@ -134,7 +146,9 @@ class TraverseService {
 
     protected function changeLocation(Character $character, array $cache) {
 
-        if (!$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y)) {
+        if (!$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
+            !$this->mapTileValue->canWalkOnDeathWater($character, $character->map->character_position_x, $character->map->character_position_y)
+        ) {
 
             $x = $cache['x'];
             $y = $cache['y'];
@@ -173,7 +187,13 @@ class TraverseService {
     protected function updateActions(int $mapId, Character $character) {
         $user      = $character->user;
         $character = new Item($character, $this->characterAttackTransformer);
-        $monsters  = new Collection(Monster::where('published', true)->where('game_map_id', $mapId)->orderBy('max_level', 'asc')->get(), $this->monsterTransformer);
+        $monsters  = new Collection(
+            Monster::where('published', true)
+                   ->where('game_map_id', $mapId)
+                   ->where('is_celestial_entity', false)
+                   ->orderBy('max_level', 'asc')->get(),
+                   $this->monsterTransformer
+        );
 
         $character = $this->manager->createData($character)->toArray();
         $monster   = $this->manager->createData($monsters)->toArray();
@@ -187,7 +207,25 @@ class TraverseService {
      * @param Character $character
      */
     protected function updateMap(Character $character) {
+        broadcast(new UpdateMapBroadcast($this->locationService->getLocationData($character->refresh()), $character->user));
+    }
 
-        broadcast(new UpdateMapBroadcast($this->locationService->getLocationData($character), $character->user));
+    /**
+     * When the character traverses, lets update the global character count for all planes.
+     *
+     * @param int $oldMap
+     */
+    protected function updateGlobalCharacterMapCount(int $oldMap) {
+        $maps = GameMap::where('id', '=', $oldMap)->get();
+
+        foreach ($maps as $map) {
+            broadcast(new UpdateGlobalCharacterCountBroadcast($map));
+        }
+
+        $maps = GameMap::where('id', '!=', $oldMap)->get();
+
+        foreach ($maps as $map) {
+            broadcast(new UpdateGlobalCharacterCountBroadcast($map));
+        }
     }
 }

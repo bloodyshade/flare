@@ -17,13 +17,86 @@ return [
     'equipment'         => [],
     'traverse'          => [],
     'teleport'          => [],
-    'planes'            => [],
+    'planes'            => [
+        [
+            'livewire'            => true,
+            'view'                => 'admin.maps.data-table',
+            'only'                => null,
+            'insert_before_table' => null,
+            'type'                => null,
+            'craft_only'          => false,
+        ]
+    ],
+    'celestials'        => [
+        [
+            'livewire'            => true,
+            'view'                => 'admin.monsters.data-table',
+            'only'                => 'celestials',
+            'insert_before_table' => null,
+            'type'                => null,
+            'craft_only'          => false,
+        ],
+        [
+            'livewire'            => true,
+            'view'                => 'admin.npcs.data-table',
+            'only'                => \App\Flare\Values\NpcTypes::SUMMONER,
+            'insert_before_table' => null,
+            'type'                => null,
+            'craft_only'          => false,
+        ]
+    ],
+    'disenchanting'     => [],
+    'npc-kingdoms'      => [],
+    'equipment-sets'    => [],
+    'npcs'              => [
+        [
+            'livewire'            => true,
+            'view'                => 'admin.npcs.data-table',
+            'only'                => null,
+            'insert_before_table' => null,
+            'type'                => null,
+            'craft_only'          => false,
+        ]
+    ],
+    'currencies'        => [],
+    'quests'            => [
+        [
+            'livewire'            => true,
+            'view'                => 'admin.quests.data-table',
+            'only'                => null,
+            'insert_before_table' => null,
+            'type'                => null,
+            'craft_only'          => false,
+        ]
+    ],
+    'usable-items'      => [
+        [
+            'livewire'            => true,
+            'view'                => 'admin.items.data-table',
+            'only'                => null,
+            'insert_before_table' => null,
+            'type'                => 'alchemy',
+            'craft_only'          => true,
+        ],
+    ],
+    'combat'            => [],
+    'items-and-kingdoms' => [],
     'kingdoms'          => [
+        [
+            'livewire'            => true,
+            'view'                => 'admin.kingdoms.buildings.data-table',
+            'only'                => null,
+            'insert_before_table' => null,
+            'type'                => null,
+            'craft_only'          => false,
+        ],
         [
             'livewire'            => true,
             'view'                => 'admin.kingdoms.units.data-table',
             'only'                => null,
             'insert_before_table' => null,
+            'type'                => null,
+            'craft_only'          => false,
         ],
     ],
     'locations'         => [
@@ -32,6 +105,8 @@ return [
             'view'                => 'admin.locations.data-table',
             'only'                => null,
             'insert_before_table' => null,
+            'type'                => null,
+            'craft_only'          => false,
         ],
     ],
     'set-sail'          => [],
@@ -41,6 +116,8 @@ return [
             'view'                => 'admin.kingdoms.units.data-table',
             'only'                => null,
             'insert_before_table' => null,
+            'type'                => null,
+            'craft_only'          => false,
         ],
     ],
     'races-and-classes' => [
@@ -49,12 +126,16 @@ return [
             'view'                => 'admin.races.data-table',
             'only'                => null,
             'insert_before_table' => null,
+            'type'                => null,
+            'craft_only'          => false,
         ],
         [
             'livewire'            => true,
             'view'                => 'admin.classes.data-table',
             'only'                => null,
             'insert_before_table' => null,
+            'type'                => null,
+            'craft_only'          => false,
         ]
     ],
     'skill-information' => [
@@ -63,6 +144,8 @@ return [
             'view'                => 'admin.skills.data-table',
             'only'                => null,
             'insert_before_table' => null,
+            'type'                => null,
+            'craft_only'          => false,
         ]
     ],
     'adventure' => [
@@ -71,6 +154,8 @@ return [
             'view'                => 'admin.adventures.data-table',
             'only'                => null,
             'insert_before_table' => null,
+            'type'                => null,
+            'craft_only'          => false,
         ]
     ],
     'crafting' => [
@@ -79,13 +164,31 @@ return [
             'view'                => 'admin.items.data-table',
             'only'                => null,
             'insert_before_table' => 'information.partials.crafting-section-one',
+            'showSkillInfo'       => true,
+            'showDropDown'        => true,
+            'type'                => null,
+            'craft_only'          => false,
         ],
         [
             'livewire'            => true,
             'view'                => 'admin.items.data-table',
             'only'                => 'quest-items-book',
             'insert_before_table' => null,
-        ]
+            'showSkillInfo'       => false,
+            'showDropDown'        => false,
+            'type'                => null,
+            'craft_only'          => false,
+        ],
+        [
+            'livewire'            => true,
+            'view'                => 'admin.items.data-table',
+            'only'                => null,
+            'insert_before_table' => 'information.partials.crafting-section-one',
+            'showSkillInfo'       => true,
+            'showDropDown'        => true,
+            'type'                => null,
+            'craft_only'          => true,
+        ],
     ],
     'enchanting' => [
         [
@@ -93,6 +196,8 @@ return [
             'view'                => 'admin.affixes.data-table',
             'insert_before_table' => null,
             'only'                => null,
+            'type'                => null,
+            'craft_only'          => false,
         ]
     ],
     'monsters' => [
@@ -101,6 +206,8 @@ return [
             'view'                => 'admin.monsters.data-table',
             'only'                => null,
             'insert_before_table' => null,
+            'type'                => null,
+            'craft_only'          => false,
         ]
     ],
 ];

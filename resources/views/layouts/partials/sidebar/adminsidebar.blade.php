@@ -9,12 +9,6 @@
         </ul>
     </li>
     <li>
-        <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-player"></i><span class="hide-menu"> Modeling</span></a>
-        <ul aria-expanded="false" class="collapse">
-            <li><a href="{{route('admin.character.modeling')}}">Character Modeling</a></li>
-        </ul>
-    </li>
-    <li>
         <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-quill-ink"></i><span class="hide-menu">Manage Classes/Races</span></a>
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('races.list')}}">Races</a></li>
@@ -42,6 +36,8 @@
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('adventures.list')}}">Adventures</a></li>
             <li><a href="{{route('adventures.create')}}">Create Adventure</a></li>
+            <li><a href="{{route('npcs.index')}}">NPC's</a></li>
+            <li><a href="{{route('quests.index')}}">Quests</a></li>
         </ul>
     </li>
     <li>
@@ -85,6 +81,14 @@
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('skills.list')}}">Skills</a></li>
             <li><a href="{{route('skills.create')}}">Create Skill</a></li>
+            <li><a href="{{route('skills.export')}}">Export</a></li>
+            <li><a href="{{route('skills.import')}}">Import</a></li>
+        </ul>
+    </li>
+    <li>
+        <a class="has-arrow" href="#" aria-expanded="false"><i class="fas fa-chart-bar"></i><span class="hide-menu">Statistics</span></a>
+        <ul aria-expanded="false" class="collapse">
+            <li><a href="{{route('admin.statistics')}}">Dashboard</a></li>
         </ul>
     </li>
 </ul>

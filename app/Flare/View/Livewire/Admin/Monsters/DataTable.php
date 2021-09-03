@@ -15,17 +15,24 @@ class DataTable extends Component
     use WithPagination, WithSorting;
 
     public $adventureId = null;
+    public $onlyMapName = null;
+    public $withCelestials = false;
     public $search      = '';
     public $sortField   = 'max_level';
     public $perPage     = 10;
     public $published   = true;
     public $canTest     = false;
     public $testCharacters = [];
+    public $only = null;
 
     protected $paginationTheme = 'bootstrap';
 
     public function fetchMonsters() {
-        $monsters = Monster::dataTableSearch($this->search);
+        if ($this->search !== '') {
+            $this->page = 1;
+        }
+
+        $monsters = Monster::where('monsters.name', 'like', '%'.$this->search.'%');
 
         if (!is_null($this->adventureId)) {
             $monsters = $monsters->join('adventure_monster', function($join) {
@@ -34,7 +41,19 @@ class DataTable extends Component
             })->select('monsters.*');
         }
 
+        if (!is_null($this->onlyMapName)) {
+            $monsters = $monsters->join('game_maps', function($join) {
+                $join->on('game_maps.id', 'monsters.game_map_id')
+                    ->where('game_maps.name', $this->onlyMapName);
+            })->select('monsters.*');
+        }
+
+        if ($this->only === 'celestials') {
+            $this->withCelestials = true;
+        }
+
         return $monsters->where('published', $this->published)
+                        ->where('is_celestial_entity', $this->withCelestials)
                         ->orderBy($this->sortField, $this->sortBy)
                         ->paginate($this->perPage);
     }
@@ -44,7 +63,7 @@ class DataTable extends Component
 
         $this->testCharacters = User::with('character')->where('is_test', true)->get();
     }
-    
+
     public function render()
     {
         return view('components.livewire.admin.monsters.data-table', [

@@ -12,12 +12,16 @@ class DataTable extends Component
     use WithPagination, WithSorting;
 
     public $search    = '';
-    public $sortField = 'name';
+    public $sortField = 'id';
     public $perPage   = 10;
 
     protected $paginationTheme = 'bootstrap';
 
     public function fetchMaps() {
+        if ($this->search !== '') {
+            $this->page = 1;
+        }
+
         $maps = GameMap::dataTableSearch($this->search)->get();
 
         $maps->transform(function($map) {

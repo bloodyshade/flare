@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-
+use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Flare\Models\Monster;
@@ -11,6 +11,8 @@ use App\Admin\Exports\Monsters\MonstersExport;
 use App\Admin\Requests\MonstersImport as MonstersImportRequest;
 
 class MonstersController extends Controller {
+
+    use MonstersShowInformation;
 
     public function __construct() {
         $this->middleware('is.admin')->except([
@@ -23,9 +25,7 @@ class MonstersController extends Controller {
     }
 
     public function show(Monster $monster) {
-        return view('admin.monsters.monster', [
-            'monster' => $monster,
-        ]);
+        return $this->renderMonsterShow($monster);
     }
 
     public function create() {
@@ -50,6 +50,9 @@ class MonstersController extends Controller {
         return view('admin.monsters.import');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function export() {
         $response = Excel::download(new MonstersExport, 'monsters.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
@@ -57,6 +60,9 @@ class MonstersController extends Controller {
         return $response;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function importData(MonstersImportRequest $request) {
         Excel::import(new MonstersImport, $request->monsters_import);
 

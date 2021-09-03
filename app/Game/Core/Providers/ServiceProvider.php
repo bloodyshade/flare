@@ -4,6 +4,8 @@ namespace App\Game\Core\Providers;
 
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\Serializers\CoreSerializer;
+use App\Game\Core\Services\InventorySetService;
+use App\Game\Core\Services\UseItemService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 use App\Game\Core\Comparison\ItemComparison;
@@ -35,8 +37,12 @@ class ServiceProvider extends ApplicationServiceProvider
             return $manager;
         });
 
+        $this->app->bind(InventorySetService::class, function($app) {
+            return new InventorySetService();
+        });
+
         $this->app->bind(EquipItemService::class, function($app) {
-            return new EquipItemService($app->make(Manager::class), $app->make(CharacterAttackTransformer::class));
+            return new EquipItemService($app->make(Manager::class), $app->make(CharacterAttackTransformer::class), $app->make(InventorySetService::class));
         });
 
         $this->app->bind(ItemComparison::class, function($app) {
@@ -54,6 +60,13 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(ShopService::class, function($app) {
             return new ShopService();
         });
+
+        $this->app->bind(UseItemService::class, function($app) {
+            return new UseItemService(
+                $app->make(Manager::class),
+                $app->make(CharacterAttackTransformer::class),
+            );
+        });
     }
 
     /**
@@ -66,6 +79,5 @@ class ServiceProvider extends ApplicationServiceProvider
         $router = $this->app['router'];
 
         $router->aliasMiddleware('is.character.adventuring', IsCharacterAdventuringMiddleware::class);
-        $router->aliasMiddleware('is.character.at.location', IsCharacterAtLocationMiddleware::class);
     }
 }

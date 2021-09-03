@@ -4,8 +4,14 @@ namespace App\Flare\Builders;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Flare\Traits\ClassBasedBonuses;
+use App\Flare\Values\CharacterClassValue;
+use App\Flare\Values\ItemUsabilityType;
+use Illuminate\Support\Collection;
 
 class CharacterInformationBuilder {
+
+    use ClassBasedBonuses;
 
     /**
      * @var Character $character
@@ -43,7 +49,7 @@ class CharacterInformationBuilder {
     public function statMod(string $stat): float {
         $base = $this->character->{$stat};
 
-        $equipped = $this->inventory->filter(function($slot) {
+        $equipped = $this->fetchInventory()->filter(function($slot) {
             return $slot->equipped;
         });
 
@@ -52,14 +58,20 @@ class CharacterInformationBuilder {
         }
 
         foreach ($equipped as $slot) {
-            $percentageIncrease = $this->fetchModdedStat($stat, $slot->item);
+            $base += $base * $this->fetchModdedStat($stat, $slot->item);
+        }
 
-            if ($percentageIncrease !== 0.0) {
-                $base += ($base * $this->fetchModdedStat($stat, $slot->item));
+        if ($this->character->boons->isNotEmpty()) {
+            $boons = $this->character->boons()->where('type', ItemUsabilityType::STAT_INCREASE)->get();
+
+            if ($boons->isNotEmpty()) {
+                $sum = $boons->sum('stat_bonus');
+
+                $base += $base + $base * $sum;
             }
         }
 
-        return round($base);
+        return $base;
     }
 
     /**
@@ -72,9 +84,39 @@ class CharacterInformationBuilder {
     public function buildAttack(): int {
 
         $characterDamageStat = $this->statMod($this->character->damage_stat);
-        $characterDamageStat *= 1 + $this->fetchSkillAttackMod();
+        $classBonuses        = $this->getFightersDamageBonus($this->character) +
+            $this->prophetDamageBonus($this->character) +
+            $this->getThievesDamageBonus($this->character) +
+            $this->getVampiresDamageBonus($this->character) +
+            $this->getRangersDamageBonus($this->character);
 
-        return round($characterDamageStat + $this->getWeaponDamage());
+        $characterDamageStat = $characterDamageStat + $characterDamageStat * $this->fetchSkillAttackMod();
+
+        $totalAttack = $this->getWeaponDamage();
+
+        return round($characterDamageStat + ($totalAttack + $totalAttack * $classBonuses));
+    }
+
+    /**
+     * Builds Total Attack.
+     *
+     * @return int
+     * @throws \Exception
+     */
+    public function buildTotalAttack(): int {
+
+        $characterDamageStat = $this->statMod($this->character->damage_stat);
+        $classBonuses        = $this->getFightersDamageBonus($this->character) +
+            $this->prophetDamageBonus($this->character) +
+            $this->getThievesDamageBonus($this->character) +
+            $this->getVampiresDamageBonus($this->character) +
+            $this->getRangersDamageBonus($this->character);
+
+        $characterDamageStat = $characterDamageStat + $characterDamageStat * $this->fetchSkillAttackMod();
+
+        $totalAttack = $this->getWeaponDamage() + $this->getSpellDamage() + $this->getTotalArtifactDamage() + $this->getTotalRingDamage();
+
+        return round($characterDamageStat + ($totalAttack + $totalAttack * $classBonuses));
     }
 
     /**
@@ -86,7 +128,7 @@ class CharacterInformationBuilder {
      * @return int
      */
     public function buildDefence(): int {
-        return round((10 + $this->getDefence()) * (1 + $this->fetchSkillACMod()));
+        return round((10 + $this->getDefence()) * (1 + $this->fetchSkillACMod() + $this->getFightersDefence($this->character)));
     }
 
     /**
@@ -95,9 +137,56 @@ class CharacterInformationBuilder {
      * Fetches the total healing amount based on skills and equipment.
      *
      * @return int
+     * @throws \Exception
      */
     public function buildHealFor(): int {
-        return round($this->fetchHealingAmount() * (1 + $this->fetchSkillHealingMod()));
+        $classBonus    = $this->prophetHealingBonus($this->character) + $this->getVampiresHealingBonus($this->character);
+
+        $classType     = new CharacterClassValue($this->character->class->name);
+
+        $healingAmount = $this->fetchHealingAmount();
+        $dmgStat       = $this->character->class->damage_stat;
+
+        if ($classType->isVampire()) {
+            $healingAmount += $this->character->{$dmgStat} - $this->character->{$dmgStat} * .025;
+        }
+
+        if ($classType->isProphet()) {
+            $hasHealingSpells = $this->prophetHasHealingSpells($this->character);
+
+            if ($hasHealingSpells) {
+                $healingAmount += $this->character->{$dmgStat} * .025;
+            }
+        }
+
+        return round($healingAmount + ($healingAmount * ($this->fetchSkillHealingMod() + $classBonus)));
+    }
+
+    /**
+     * Fetch the resurrection chance;
+     *
+     * @return float
+     * @throws \Exception
+     */
+    public function fetchResurrectionChance(): float {
+        $resurrectionItems = $this->fetchInventory()->filter(function($slot) {
+            return $slot->item->can_resurrect;
+        });
+
+        $chance    = 0.0;
+        $classType = new CharacterClassValue($this->character->class->name);
+
+        if ($classType->isVampire() || $classType->isProphet()) {
+            $chance += 0.05;
+        }
+
+        if ($resurrectionItems->isEmpty()) {
+             return $chance;
+        }
+
+        $chance += $resurrectionItems->sum('item.resurrection_chance');
+
+        return $chance;
     }
 
     /**
@@ -114,15 +203,17 @@ class CharacterInformationBuilder {
             return 0;
         }
 
-        $totalPercentage = 1.0;
+        $baseHealth = $this->character->dur + 10;
 
-        foreach ($this->character->inventory->slots as $slot) {
+        foreach ($this->fetchInventory() as $slot) {
             if ($slot->equipped) {
-                $totalPercentage += $slot->item->getTotalPercentageForStat('dur');
+                $percentage = $slot->item->getTotalPercentageForStat('dur');
+
+                $baseHealth += $baseHealth * $percentage;
             }
         }
 
-        return ($this->character->dur + 10) * $totalPercentage;
+        return $baseHealth;
     }
 
     /**
@@ -131,7 +222,7 @@ class CharacterInformationBuilder {
      * @return bool
      */
     public function hasArtifacts(): bool {
-        return $this->inventory->filter(function ($slot) {
+        return $this->fetchInventory()->filter(function ($slot) {
             return $slot->item->type === 'artifact' && $slot->equipped;
         })->isNotEmpty();
     }
@@ -142,7 +233,7 @@ class CharacterInformationBuilder {
      * @return bool
      */
     public function hasAffixes(): bool {
-        return $this->inventory->filter(function ($slot) {
+        return $this->fetchInventory()->filter(function ($slot) {
             return ((!is_null($slot->item->itemPrefix)) || (!is_null($slot->item->itemSuffix))) && $slot->equipped;
         })->isNotEmpty();
     }
@@ -153,16 +244,101 @@ class CharacterInformationBuilder {
      * @return bool
      */
     public function hasDamageSpells(): bool {
-        return $this->inventory->filter(function ($slot) {
+        return $this->fetchInventory()->filter(function ($slot) {
             return $slot->item->type === 'spell-damage' && $slot->equipped;
         })->isNotEmpty();
+    }
+
+    /**
+     * Get the total Spell Damage
+     *
+     * @return int
+     */
+    public function getTotalSpellDamage(): int {
+        return $this->getSpellDamage();
+    }
+
+    /**
+     * Get the total artifact damage.
+     *
+     * @return int
+     */
+    public function getTotalArtifactDamage(): int {
+        return $this->getArtifactDamage();
+    }
+
+    /**
+     * Gets the total ring damage.
+     *
+     * @return int
+     */
+    public function getTotalRingDamage(): int {
+        return $this->getRingDamage();
+    }
+
+    /**
+     * Get total annulment
+     *
+     * @return float
+     */
+    public function getTotalAnnulment(): float {
+        return $this->getArtifactAnnulment();
+    }
+
+    /**
+     * Get total spell evasion
+     *
+     * @return float
+     */
+    public function getTotalSpellEvasion(): float {
+        return  $this->getSpellEvasion();
+    }
+
+    protected function getSpellEvasion(): float {
+        $skillSpellEvasion = 0.0;
+
+        $skill = $this->character->skills->filter(function($skill) {
+            return $skill->type()->isSpellEvasion();
+        })->first();
+
+        if (!is_null($skill)) {
+            $skillSpellEvasion = $skill->skill_bonus;
+        }
+
+        $itemsEvasion = $this->fetchInventory()->filter(function ($slot) {
+            return $slot->item->type === 'ring' && $slot->equipped;
+        })->sum('item.spell_evasion');
+
+        return $itemsEvasion + $skillSpellEvasion;
+    }
+
+    protected function getArtifactAnnulment(): float {
+        $skillArtifactAnnulment = 0.0;
+
+        $skill = $this->character->skills->filter(function($skill) {
+            return $skill->type()->isArtifactAnnulment();
+        })->first();
+
+        if (!is_null($skill)) {
+            $skillArtifactAnnulment = $skill->skill_bonus;
+        }
+
+        $itemsEvasion = $this->fetchInventory()->filter(function ($slot) {
+            return $slot->item->type === 'ring' && $slot->equipped;
+        })->sum('item.artifact_annulment');
+
+        return $itemsEvasion + $skillArtifactAnnulment;
     }
 
     protected function fetchSkillAttackMod(): float {
         $percentageBonus = 0.0;
 
-        foreach ($this->character->skills as $skill) {
-            $percentageBonus += $skill->base_damage_mod + ($skill->level / 100);
+        $skills = $this->character->skills->filter(function($skill) {
+            return is_null($skill->baseSkill->game_class_id);
+        })->all();
+
+        foreach ($skills as $skill) {
+            $percentageBonus += $skill->base_damage_mod;
         }
 
         return $percentageBonus;
@@ -171,8 +347,12 @@ class CharacterInformationBuilder {
     protected function fetchSkillHealingMod(): float {
         $percentageBonus = 0.0;
 
-        foreach ($this->character->skills as $skill) {
-            $percentageBonus += $skill->base_healing_mod + ($skill->level / 100);
+        $skills = $this->character->skills->filter(function($skill) {
+            return is_null($skill->baseSkill->game_class_id);
+        })->all();
+
+        foreach ($skills as $skill) {
+            $percentageBonus += $skill->base_healing_mod;
         }
 
         return $percentageBonus;
@@ -181,8 +361,12 @@ class CharacterInformationBuilder {
     protected function fetchSkillACMod(): float {
         $percentageBonus = 0.0;
 
-        foreach ($this->character->skills as $skill) {
-            $percentageBonus += $skill->base_ac_mod = ($skill->level / 100);
+        $skills = $this->character->skills->filter(function($skill) {
+            return is_null($skill->baseSkill->game_class_id);
+        })->all();
+
+        foreach ($skills as $skill) {
+            $percentageBonus += $skill->base_ac_mod;
         }
 
         return $percentageBonus;
@@ -191,8 +375,52 @@ class CharacterInformationBuilder {
     protected function getWeaponDamage(): int {
         $damage = 0;
 
-        foreach ($this->inventory as $slot) {
-            $damage += $slot->item->getTotalDamage();
+        foreach ($this->fetchInventory() as $slot) {
+            if ($slot->item->type === 'weapon') {
+                $damage += $slot->item->getTotalDamage();
+            }
+        }
+
+        return $damage;
+    }
+
+    protected function getSpellDamage(): int {
+        $damage = 0;
+
+        foreach ($this->fetchInventory() as $slot) {
+            if ($slot->item->type === 'spell-damage') {
+                $damage += $slot->item->getTotalDamage();
+            }
+        }
+
+        $bonus = $this->hereticSpellDamageBonus($this->character);
+
+        if ($bonus < 2) {
+            $bonus += 1;
+        }
+
+        return $damage * $bonus;
+    }
+
+    protected function getArtifactDamage(): int {
+        $damage = 0;
+
+        foreach ($this->fetchInventory() as $slot) {
+            if ($slot->item->type === 'artifact') {
+                $damage += $slot->item->getTotalDamage();
+            }
+        }
+
+        return $damage;
+    }
+
+    protected function getRingDamage(): int {
+        $damage = 0;
+
+        foreach ($this->fetchInventory() as $slot) {
+            if ($slot->item->type === 'ring') {
+                $damage += $slot->item->getTotalDamage();
+            }
         }
 
         return $damage;
@@ -201,13 +429,13 @@ class CharacterInformationBuilder {
     protected function getDefence(): int {
         $defence = 0;
 
-        foreach ($this->inventory as $slot) {
+        foreach ($this->fetchInventory() as $slot) {
 
             $defence += $slot->item->getTotalDefence();
         }
 
         if ($defence !== 10) {
-            return $defence / 8;
+            return $defence / 6;
         }
 
         return $defence;
@@ -216,11 +444,36 @@ class CharacterInformationBuilder {
     protected function fetchHealingAmount(): int {
         $healFor = 0;
 
-        foreach ($this->inventory as $slot) {
+        foreach ($this->fetchInventory() as $slot) {
             $healFor += $slot->item->getTotalHealing();
         }
 
         return $healFor;
+    }
+
+    /**
+     * Fetch the appropriate inventory.
+     *
+     * Either return the current inventory, by default, if not empty or
+     * return the inventory set that is currently equipped.
+     *
+     * Players cannot have both equipped at the same time.
+     *
+     * @return Collection
+     */
+    protected function fetchInventory(): Collection
+    {
+        if ($this->inventory->isNotEmpty()) {
+            return $this->inventory;
+        }
+
+        $inventorySet = $this->character->inventorySets()->where('is_equipped', true)->first();
+
+        if (!is_null($inventorySet)) {
+            return $inventorySet->slots;
+        }
+
+        return $this->inventory;
     }
 
     protected function fetchModdedStat(string $stat, Item $item): float {

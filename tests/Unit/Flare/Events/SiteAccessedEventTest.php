@@ -15,13 +15,13 @@ use App\Flare\Models\UserSiteAccessStatistics;
 
 class SiteAccessedEventTest extends TestCase {
 
-    use RefreshDatabase, CreateUser, CreateRole, CreateUserSiteAccessStatistics;
+    use CreateUser, CreateRole, CreateUserSiteAccessStatistics;
 
 
     public function setUp(): void {
         parent::setUp();
 
-        $this->createAdmin([], $this->createAdminRole());
+        $this->createAdmin($this->createAdminRole(), []);
     }
 
     public function tearDown(): void {
@@ -50,16 +50,9 @@ class SiteAccessedEventTest extends TestCase {
         $this->assertTrue(UserSiteAccessStatistics::count() > 1);
     }
 
-    public function testSetsRecordWhenLoggingOut() {
-        $this->createUserSiteAccessStatistics();
-
-        event(new Login('auth', User::first(), false));
-
-        $this->assertTrue(UserSiteAccessStatistics::count() > 1);
-    }
-
     public function testSetsRecordWithOutAdmin() {
-        User::first()->delete();
+
+        User::doesntHave('character')->first()->delete();
 
         event(new Login('auth', User::first(), false));
 
@@ -67,7 +60,7 @@ class SiteAccessedEventTest extends TestCase {
     }
 
     public function testSetsRecordWhenOneExistsWithOutAdmin() {
-        User::first()->delete();
+        User::doesntHave('character')->first()->delete();
 
         $this->createUserSiteAccessStatistics();
 
@@ -77,21 +70,11 @@ class SiteAccessedEventTest extends TestCase {
     }
 
     public function testSetsRecordWhenJustSigningInWithOutAdmin() {
-        User::first()->delete();
+        User::doesntHave('character')->first()->delete();
 
         $this->createUserSiteAccessStatistics();
 
         event(new Login('auth', User::first(), false));
-
-        $this->assertTrue(UserSiteAccessStatistics::count() > 1);
-    }
-
-    public function testSetsRecordWhenLoggingOutWithOutAdmin() {
-        User::first()->delete();
-
-        $this->createUserSiteAccessStatistics();
-
-        event(new Logout('auth', null));
 
         $this->assertTrue(UserSiteAccessStatistics::count() > 1);
     }

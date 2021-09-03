@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
+use App\Flare\Models\GameMap;
 use DB;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -14,12 +15,13 @@ class KingdomResourcesServiceTest extends TestCase {
 
     use RefreshDatabase, CreateKingdom, CreateGameBuilding;
 
-    public function testkingdomGetsUpdated() {
+    public function testKingdomGetsUpdated() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -44,6 +46,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'     => 100,
                 'current_durability' => 100,
                 'current_defence'    => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 100,
+                'current_defence'    => 100,
             ]
         ]);
 
@@ -60,7 +73,7 @@ class KingdomResourcesServiceTest extends TestCase {
         $this->assertTrue($kingdom->current_population > 0);
     }
 
-    public function testkingdomGetsUpdatedWhenUserIsOnline() {
+    public function testKingdomGetsUpdatedWhenUserIsOnline() {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
         DB::table('sessions')->insert([[
@@ -74,8 +87,9 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $this->createKingdom([
             'character_id'       => $characterFactory->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -93,6 +107,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'game_building_id'     => $this->createGameBuilding([
                     'is_resource_building' => true,
                     'increase_wood_amount' => 100
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 100,
+                'current_defence'    => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
                 ])->id,
                 'kingdom_id'          => $kingdom->id,
                 'level'                => 1,
@@ -118,10 +143,11 @@ class KingdomResourcesServiceTest extends TestCase {
     public function testKingdomMaxPopulationGetsSetAsCurrentPopulation() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
             'max_population'     => 1,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -139,6 +165,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'game_building_id'     => $this->createGameBuilding([
                     'is_resource_building' => true,
                     'increase_wood_amount' => 100
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 100,
+                'current_defence'    => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
                 ])->id,
                 'kingdom_id'          => $kingdom->id,
                 'level'                => 1,
@@ -164,10 +201,11 @@ class KingdomResourcesServiceTest extends TestCase {
     public function testKingdomMaxResourceGetsSetAsCurrentResourse() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_wood'       => 0,
             'max_wood'           => 1,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -193,6 +231,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'current_durability' => 100,
                 'current_defence'    => 100,
             ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 100,
+                'current_defence'    => 100,
+            ]
         ]);
 
         $kingdom = $kingdom->refresh();
@@ -210,10 +259,11 @@ class KingdomResourcesServiceTest extends TestCase {
     public function testKingdomDecreasesMorale() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
             'current_morale'     => 0.10,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -237,6 +287,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'     => 100,
                 'current_durability' => 0,
                 'current_defence'    => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'               => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 0,
+                'current_defence'    => 100,
             ]
         ]);
 
@@ -250,15 +311,16 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $this->assertTrue($kingdom->current_morale < .50);
         $this->assertFalse($kingdom->current_wood < 500);
-        $this->assertFalse($kingdom->current_population > 0);
+        $this->assertTrue($kingdom->current_population > 0);
     }
 
     public function testKingdomAdjustMorale() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -283,6 +345,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'     => 100,
                 'current_durability' => 0,
                 'current_defence'    => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 0,
+                'current_defence'    => 100,
             ]
         ]);
 
@@ -294,7 +367,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
-        $this->assertEquals($kingdom->current_morale, .50);
+        $this->assertEquals($kingdom->current_morale, .45);
         $this->assertEquals($kingdom->current_wood, 700);
         $this->assertTrue($kingdom->current_population > 0);
     }
@@ -302,11 +375,12 @@ class KingdomResourcesServiceTest extends TestCase {
     public function testKingdomDoNotAddMorale() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
             'current_morale'     => 1.0,
             'max_population'     => 1,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -335,6 +409,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'         => 100,
                 'current_durability'     => 0,
                 'current_defence'        => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 100,
+                'current_defence'    => 100,
             ]
         ]);
 
@@ -353,11 +438,12 @@ class KingdomResourcesServiceTest extends TestCase {
     public function testKingdomSetMoraleToOne() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
             'current_morale'     => 0,
             'max_population'     => 1,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -386,7 +472,19 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'         => 100,
                 'current_durability'     => 100,
                 'current_defence'        => 100,
-            ]
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name'                   => 'Keep',
+                    'increase_morale_amount' => 2.0,
+                ])->id,
+                'kingdom_id'            => $kingdom->id,
+                'level'                  => 1,
+                'max_defence'            => 100,
+                'max_durability'         => 100,
+                'current_durability'     => 100,
+                'current_defence'        => 100,
+            ],
         ]);
 
         $kingdom = $kingdom->refresh();
@@ -404,11 +502,12 @@ class KingdomResourcesServiceTest extends TestCase {
     public function testKingdomDoNotReduceMorale() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
             'current_morale'     => 0,
             'max_population'     => 1,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -437,6 +536,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'         => 100,
                 'current_durability'     => 0,
                 'current_defence'        => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 100,
+                'current_defence'    => 100,
             ]
         ]);
 
@@ -454,11 +564,12 @@ class KingdomResourcesServiceTest extends TestCase {
     public function testKingdomDoNotReduceMoraleBelowZero() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
             'current_morale'     => .50,
             'max_population'     => 1,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -487,6 +598,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'         => 100,
                 'current_durability'     => 0,
                 'current_defence'        => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 100,
+                'current_defence'    => 100,
             ]
         ]);
 
@@ -504,11 +626,12 @@ class KingdomResourcesServiceTest extends TestCase {
     public function testKingdomDoNotAdjustMoraleBelowZero() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
             'current_morale'     => .50,
             'max_population'     => 1,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -537,6 +660,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'         => 100,
                 'current_durability'     => 100,
                 'current_defence'        => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 100,
+                'current_defence'    => 100,
             ]
         ]);
 
@@ -565,10 +699,11 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $this->createKingdom([
             'character_id'       => $characterFactory->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_morale'     => 0,
-            'treasury'           => 1000
+            'treasury'           => 1000,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -597,14 +732,25 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'         => 100,
                 'current_durability'     => 0,
                 'current_defence'        => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 100,
+                'current_defence'    => 100,
             ]
         ]);
 
         $kingdom = $kingdom->refresh();
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 

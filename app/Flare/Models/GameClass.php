@@ -20,14 +20,17 @@ class GameClass extends Model
     protected $fillable = [
         'name',
         'damage_stat',
+        'to_hit_stat',
         'str_mod',
         'dur_mod',
         'dex_mod',
         'chr_mod',
         'int_mod',
+        'agi_mod',
+        'focus_mod',
         'accuracy_mod',
         'dodge_mod',
-        'deffense_mod',
+        'defense_mod',
         'looting_mod',
     ];
 
@@ -37,16 +40,22 @@ class GameClass extends Model
      * @var array
      */
     protected $casts = [
-        'str_mod'      => 'float',
-        'dur_mod'      => 'float',
-        'dex_mod'      => 'float',
-        'chr_mod'      => 'float',
-        'int_mod'      => 'float',
+        'str_mod'      => 'integer',
+        'dur_mod'      => 'integer',
+        'dex_mod'      => 'integer',
+        'chr_mod'      => 'integer',
+        'int_mod'      => 'integer',
+        'agi_mod'      => 'integer',
+        'focus_mod'    => 'integer',
         'accuracy_mod' => 'float',
         'dodge_mod'    => 'float',
-        'deffense_mod' => 'float',
+        'defense_mod'  => 'float',
         'looting_mod'  => 'float',
     ];
+
+    public function gameSkills() {
+        return $this->hasMany(GameSkill::class, 'game_class_id', 'id');
+    }
 
     protected static function newFactory() {
         return GameClassFactory::new();

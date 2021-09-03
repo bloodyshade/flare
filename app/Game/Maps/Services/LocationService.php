@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Services;
 
+use App\Flare\Models\CelestialFight;
 use Storage;
 use League\Fractal\Manager;
 use App\Flare\Cache\CoordinatesCache;
@@ -93,16 +94,24 @@ class LocationService {
             'can_move'               => $character->can_move,
             'timeout'                => $character->can_move_again_at,
             'port_details'           => $this->portDetails,
+            'map_name'               => $character->map->gameMap->name,
             'adventure_details'      => $this->adventureDetails,
             'adventure_logs'         => $character->adventureLogs,
             'adventure_completed_at' => $character->can_adventure_again_at,
             'is_dead'                => $character->is_dead,
             'teleport'               => $this->coordinatesCache->getFromCache(),
+            'celestials'             => CelestialFight::where('x_position', $character->x_position)->where('y_position', $character->y_position)->with('monster')->get()->toArray(),
             'can_settle_kingdom'     => $this->canSettle,
             'can_attack_kingdom'     => $this->canAttack,
             'can_manage_kingdom'     => $this->canManage,
             'kingdom_to_attack'      => $this->kingdomToAttack,
             'my_kingdoms'            => $this->getKingdoms($character),
+            'npc_kingdoms'           => Kingdom::select('x_position', 'y_position', 'npc_owned')->whereNull('character_id')->where('game_map_id', $character->map->game_map_id)->where('npc_owned', true)->get(),
+            'other_kingdoms'         => $this->getEnemyKingdoms($character),
+            'characters_on_map'      => Character::join('maps', function($query) use ($character) {
+                $mapId = $character->map->game_map_id;
+                $query->on('characters.id', 'maps.character_id')->where('game_map_id', $mapId);
+            })->count(),
         ];
     }
 
@@ -144,6 +153,7 @@ class LocationService {
     protected function kingdomManagement(Character $character): void {
         $kingdom   = Kingdom::where('x_position', $character->x_position)
                             ->where('y_position', $character->y_position)
+                            ->where('game_map_id', $character->map->game_map_id)
                             ->first();
 
         // See if the characters kingdoms
@@ -153,7 +163,22 @@ class LocationService {
         })->get();
 
         if (!is_null($kingdom)) {
-            if ($character->id !== $kingdom->character->id) {
+            if (!is_null($kingdom->character_id)) {
+                if ($character->id !== $kingdom->character->id) {
+                    $this->canAttack = $units->isNotEmpty();
+
+                    $this->kingdomToAttack = [
+                        'id' => $kingdom->id,
+                        'x_position' => $kingdom->x_position,
+                        'y_position' => $kingdom->y_position,
+                    ];
+                } else {
+                    $this->canManage = true;
+
+                    $kingdom->updateLastWalked();
+                }
+            } else {
+                // You can attack npc kingdoms.
                 $this->canAttack = $units->isNotEmpty();
 
                 $this->kingdomToAttack = [
@@ -161,8 +186,6 @@ class LocationService {
                     'x_position' => $kingdom->x_position,
                     'y_position' => $kingdom->y_position,
                 ];
-            } else {
-                $this->canManage = true;
             }
         } else if (is_null($this->location)) {
             $this->canSettle = true;

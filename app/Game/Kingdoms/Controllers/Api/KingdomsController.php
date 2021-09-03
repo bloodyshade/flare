@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
+use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -36,7 +37,7 @@ class KingdomsController extends Controller {
         $this->kingdom = $kingdom;
     }
 
-    public function getLocationData(Kingdom $kingdom) {
+    public function getLocationData(Character $character, Kingdom $kingdom) {
         $kingdom  = new Item($kingdom, $this->kingdom);
 
         return response()->json(
@@ -46,6 +47,12 @@ class KingdomsController extends Controller {
     }
 
     public function settle(KingdomsSettleRequest $request, Character $character, KingdomService $kingdomService) {
+        $kingdom = Kingdom::where('name', $request->name)->where('game_map_id', $character->map->game_map_id)->first();
+
+        if (!is_null($kingdom)) {
+            return response()->json(['message' => 'Name is taken'], 422);
+        }
+
         $kingdomService->setParams($request->all(), $character);
 
         if (!$kingdomService->canSettle($request->x_position, $request->y_position, $character)) {
@@ -93,6 +100,12 @@ class KingdomsController extends Controller {
             ], 422);
         }
 
+        if ($building->level + 1 > $building->gameBuilding->max_level) {
+            return response()->json([
+                'message' => "Building is already max level."
+            ], 422);
+        }
+
         $kingdom = $buildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
 
         $buildingService->upgradeKingdomBuilding($building, $character);
@@ -131,9 +144,23 @@ class KingdomsController extends Controller {
             'amount' => 'required|integer',
         ]);
 
+        if ($request->amount > KingdomMaxValue::MAX_UNIT) {
+            return response()->json([
+                'message' => 'Too many units'
+            ], 422);
+        }
+
+        $currentAmount = $kingdom->units()->where('game_unit_id', $gameUnit->id)->sum('amount');
+
+        if ($currentAmount >= KingdomMaxValue::MAX_UNIT) {
+            return response()->json([
+                'message' => 'Too many units'
+            ], 422);
+        }
+
         if ($request->amount <= 0) {
             return response()->json([
-                'message' => "Too few units to recuit."
+                'message' => "Too few units to recruit."
             ], 422);
         }
 

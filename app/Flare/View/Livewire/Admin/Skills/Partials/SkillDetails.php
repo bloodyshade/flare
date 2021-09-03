@@ -3,28 +3,47 @@
 namespace App\Flare\View\Livewire\Admin\Skills\Partials;
 
 use App\Flare\Models\GameSkill;
+use App\Game\Skills\Values\SkillTypeValue;
 use Livewire\Component;
 
 class SkillDetails extends Component
 {
     public $skill;
 
+    public $skillTypes;
+
     protected $rules = [
         'skill.name'                    => 'required',
+        'skill.type'                    => 'required',
         'skill.description'             => 'required',
         'skill.max_level'               => 'required',
-        'skill.can_monsters_have_skill' => 'nullable'
+        'skill.can_monsters_have_skill' => 'nullable',
+        'skill.is_locked'               => 'nullable',
     ];
 
     protected $messages =[
         'skill.name.required'        => 'Name required.',
+        'skill.name.type'            => 'Type required.',
         'skill.description.required' => 'Description required.',
         'skill.max_level.required'   => 'Max Level is required.',
     ];
 
     protected $listeners = ['validateInput'];
 
+    public $types = [
+        'spell-damage',
+        'spell-healing',
+    ];
+
     public function validateInput(string $functionName, int $index) {
+        if (is_null($this->skill->can_monsters_have_skill)) {
+            $this->skill->can_monsters_have_skill = false;
+        }
+
+        if (is_null($this->skill->is_locked)) {
+            $this->skill->is_locked = false;
+        }
+
         $this->validate();
 
         if ($this->skill->max_level <= 0) {
@@ -41,6 +60,8 @@ class SkillDetails extends Component
         if (is_null($this->skill)) {
             $this->skill = new GameSkill;
         }
+
+        $this->skillTypes = SkillTypeValue::$namedValues;
     }
 
     public function render() {

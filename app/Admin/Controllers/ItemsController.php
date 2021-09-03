@@ -2,20 +2,24 @@
 
 namespace App\Admin\Controllers;
 
-
-use App\Http\Controllers\Controller;
+use App\Admin\Exports\Items\ItemsExport;
+use App\Admin\Import\Items\ItemsImport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Facades\App\Flare\Calculators\SellItemCalculator;
+use App\Http\Controllers\Controller;
 use App\Admin\Requests\ItemsImport as ItemsImportRequest;
-use App\Admin\Exports\Items\ItemsExport;
-use App\Admin\Import\Items\ItemsImport;
+use App\Admin\Exports\Items\QuestsExport;
+use App\Admin\Import\Items\QuestsImport;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Traits\Controllers\ItemsShowInformation;
 
 class ItemsController extends Controller {
+
+    use ItemsShowInformation;
 
     public function index() {
         return view('admin.items.items', [
@@ -28,6 +32,10 @@ class ItemsController extends Controller {
             'item' => null,
             'editing' => false,
         ]);
+    }
+
+    public function show(Item $item) {
+        return $this->renderItemShow('game.items.item', $item);
     }
 
     public function edit(Item $item) {
@@ -45,13 +53,19 @@ class ItemsController extends Controller {
         return view('admin.items.import');
     }
 
-    public function export() {
-        $response = Excel::download(new ItemsExport, 'items.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+    /**
+     * @codeCoverageIgnore
+     */
+    public function export(Request $request) {
+        $response = Excel::download(new ItemsExport($request->has('affixes')), 'items.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
         return $response;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function importData(ItemsImportRequest $request) {
         Excel::import(new ItemsImport, $request->items_import);
 

@@ -5,10 +5,15 @@ namespace App\Game\Maps\Services;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
+use App\Flare\Models\Npc;
+use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Values\NpcTypes;
+use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
@@ -34,6 +39,10 @@ class MovementService {
      * @var array $kingdomData
      */
     private $kingdomData = [];
+
+    private $npcKingdoms = [];
+
+    private $celestialEntities = [];
 
     /**
      * @var PortService $portService
@@ -61,6 +70,13 @@ class MovementService {
     private $traverseService;
 
     /**
+     * @var ConjureService $conjureService
+     */
+    private $conjureService;
+
+    private const CHANCE_FOR_CELESTIAL_TO_SPAWN = 1000000;
+
+    /**
      * Constructor
      *
      * @param PortService $portService
@@ -70,13 +86,15 @@ class MovementService {
                                 MapTileValue $mapTile,
                                 CoordinatesCache $coordinatesCache,
                                 MapPositionValue $mapPositionValue,
-                                TraverseService $traverseService)
+                                TraverseService $traverseService,
+                                ConjureService $conjureService)
     {
         $this->portService      = $portService;
         $this->mapTile          = $mapTile;
         $this->coordinatesCache = $coordinatesCache;
         $this->mapPositionValue = $mapPositionValue;
         $this->traverseService  = $traverseService;
+        $this->conjureService   = $conjureService;
     }
 
     /**
@@ -98,6 +116,14 @@ class MovementService {
                 return $this->moveCharacter($character, $params);
             } else {
                 return $this->errorResult('cannot walk on water.');
+            }
+        }
+
+        if ($this->mapTile->isDeathWaterTile((int) $mapTileColor)) {
+            if ($this->mapTile->canWalkOnDeathWater($character, $xPosition, $yPosition)) {
+                return $this->moveCharacter($character, $params);
+            } else {
+                return $this->errorResult('cannot walk on death water.');
             }
         }
 
@@ -141,6 +167,21 @@ class MovementService {
             $this->processLocation($location, $character);
         }
 
+        $this->npcKingdoms       = Kingdom::select('x_position', 'y_position', 'npc_owned')
+                                          ->whereNull('character_id')
+                                          ->where('npc_owned', true)
+                                          ->where('game_map_id', $character->map->game_map_id)
+                                          ->get()
+                                          ->toArray();
+
+        $celestialEntity = CelestialFight::with('monster')->where('x_position', $character->x_position)
+                                         ->where('y_position', $character->y_position)
+                                         ->first();
+
+        if (!is_null($celestialEntity)) {
+            $this->celestialEntities[] = $celestialEntity->toArray();
+        }
+
         $kingdom = Kingdom::where('x_position', $character->x_position)
                           ->where('y_position', $character->y_position)
                           ->where('game_map_id', $character->map->game_map_id)
@@ -152,23 +193,45 @@ class MovementService {
         $kingdomToAttack = [];
 
         if (!is_null($kingdom)) {
-            if ($kingdom->character->id !== $character->id) {
+            if (!is_null($kingdom->character_id)) {
+                if ($kingdom->character->id !== $character->id) {
+                    $canAttack = true;
+
+                    $kingdomToAttack = [
+                        'id' => $kingdom->id,
+                        'x_position' => $kingdom->x_position,
+                        'y_position' => $kingdom->y_position,
+                    ];
+                } else {
+                    $canManage = true;
+
+                    $kingdom->updateLastwalked();
+                }
+            } else {
                 $canAttack = true;
 
                 $kingdomToAttack = [
-                    'id'         => $kingdom->id,
+                    'id' => $kingdom->id,
                     'x_position' => $kingdom->x_position,
                     'y_position' => $kingdom->y_position,
                 ];
-            } else {
-                $canManage = true;
             }
         } else if (is_null($location)) {
             $canSettle = true;
         }
 
+        $owner = null;
+
+        if (!is_null($kingdom)) {
+            if (!is_null($kingdom->character_id)) {
+                $owner = $kingdom->character->name;
+            } else {
+                $owner = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first()->name . ' (NPC)';
+            }
+        }
+
         $this->kingdomData = [
-            'owner'             => is_null($kingdom) ? 'No one' : $kingdom->character->name,
+            'owner'             => $owner,
             'can_attack'        => $canAttack,
             'can_manage'        => $canManage,
             'can_settle'        => $canSettle,
@@ -230,10 +293,17 @@ class MovementService {
      * @return array
      */
     public function teleport(Character $character, int $x, int $y, int $cost, int $timeout): array {
-        $canTeleport = $this->mapTile->canWalkOnWater($character, $x, $y);
+        $canTeleportToWater = $this->mapTile->canWalkOnWater($character, $x, $y);
+        $canTeleportToDeathWater = $this->mapTile->canWalkOnDeathWater($character, $x, $y);
 
-        if (!$canTeleport) {
-            $item = Item::where('effect', 'walk-on-water')->first();
+        if (!$canTeleportToWater) {
+            $item = Item::where('effect', ItemEffectsValue::WALK_ON_WATER)->first();
+
+            return $this->errorResult('Cannot teleport to water locations without a ' . $item->name);
+        }
+
+        if (!$canTeleportToDeathWater) {
+            $item = Item::where('effect', ItemEffectsValue::WALK_ON_DEATH_WATER)->first();
 
             return $this->errorResult('Cannot teleport to water locations without a ' . $item->name);
         }
@@ -247,6 +317,8 @@ class MovementService {
         if (!in_array($x, $coordinates['x']) && !in_array($x, $coordinates['y'])) {
             return $this->errorResult('Invalid coordinates');
         }
+
+        $this->attemptConjure($character);
 
         $character->map->update([
             'character_position_x' => $x,
@@ -295,10 +367,18 @@ class MovementService {
 
         $character = $character->refresh();
 
+        $this->attemptConjure($character);
+
+        $celestialEntity = CelestialFight::with('monster')->where('x_position', $character->x_position)
+            ->where('y_position', $character->y_position)
+            ->first();
+
+
         return $this->successResult([
             'character_position_details' => $character->map,
             'port_details'               => $this->portService->getPortDetails($character, $location),
             'adventure_details'          => $location->adventures->isNotEmpty() ? $location->adventures : [],
+            'celestial_entities'         => !is_null($celestialEntity) ? [$celestialEntity] : [],
         ]);
     }
 
@@ -323,10 +403,37 @@ class MovementService {
     /**
      * Get the kingdom data
      *
-     * @param array
+     * @return array
      */
     public function kingdomDetails(): array {
         return $this->kingdomData;
+    }
+
+    /**
+     * Gets the NPC owned kingdoms.
+     *
+     * @return array
+     */
+    public function npcOwnedKingdoms(): array {
+        return $this->npcKingdoms;
+    }
+
+    /**
+     * Get celestials
+     *
+     * @return array
+     */
+    public function celestialEntities(): array {
+        return $this->celestialEntities;
+    }
+
+    /**
+     * Can conjure Celestials?
+     *
+     * @return bool
+     */
+    public function canConjure() {
+        return rand(1, self::CHANCE_FOR_CELESTIAL_TO_SPAWN) > (self::CHANCE_FOR_CELESTIAL_TO_SPAWN - 1);
     }
 
     /**
@@ -342,6 +449,8 @@ class MovementService {
 
         $character = $character->refresh();
 
+        $this->attemptConjure($character);
+
         $this->processArea($character);
 
         $this->updateCharacterMovementTimeOut($character);
@@ -350,7 +459,24 @@ class MovementService {
             'port_details'      => $this->portDetails(),
             'adventure_details' => $this->adventureDetails(),
             'kingdom_details'   => $this->kingdomDetails(),
+            'celestials'        => $this->celestialEntities(),
+            'characters_on_map' => Character::join('maps', function($query) use ($character) {
+                $mapId = $character->map->game_map_id;
+                $query->on('characters.id', 'maps.character_id')->where('game_map_id', $mapId);
+            })->count()
         ]);
+    }
+
+
+    /**
+     * Attempt to conjure Celestial to any plane on Movement, Teleport or Set Sail
+     *
+     * @param Character $character
+     */
+    protected function attemptConjure(Character $character) {
+        if ($this->canConjure()) {
+            $this->conjureService->movementConjure($character);
+        }
     }
 
     /**
@@ -389,7 +515,7 @@ class MovementService {
             })->first();
 
             if (is_null($item)) {
-                if (!($character->inventory->slots()->count() < $character->inventory_max)) {
+                if ($character->isInventoryFull()) {
                     event(new ServerMessageEvent($character->user, 'inventory_full'));
                 } else {
                     $character->inventory->slots()->create([

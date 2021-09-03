@@ -68,7 +68,7 @@ class AdventureFightServiceTest extends TestCase
     public function testCantBlock() {
 
         $this->character->adventureLogs()->first()->adventure->monsters()->first()->update([
-            'ac' => 500
+            'ac' => 500,
         ]);
 
         $this->character = $this->character->refresh();
@@ -84,7 +84,8 @@ class AdventureFightServiceTest extends TestCase
         $logs = $fightService->getLogInformation();
 
         $this->assertFalse(empty($logs));
-        $this->assertEquals($logs[0]['message'], 'Goblin blocked the attack!');
+
+        $this->assertEquals($logs[0]['messages'][0][0], 'Goblin blocked the attack!');
         $this->assertTrue($fightService->tooLong());
     }
 
@@ -155,8 +156,8 @@ class AdventureFightServiceTest extends TestCase
                                         ->giveItem($healingSpell)
                                         ->giveItem($damageSpell)
                                         ->giveItem($artifact)
-                                        ->equipSpellSlot('spell-one', 1)
-                                        ->equipSpellSlot('spell-two', 2)
+                                        ->equipSpellSlot($healingSpell->name, 'spell-one')
+                                        ->equipSpellSlot($damageSpell->name, 'spell-two', )
                                         ->getCharacterFactory()
                                         ->updateSkill('Accuracy', [
                                             'skill_bonus_per_level' => 10,
